@@ -36,7 +36,9 @@ public class BaseTest {
     public void setUp() {
         String env = ConfigReader.getProperty("env");
         String baseUrl = ConfigReader.getProperty("url." + env);
-        System.setProperty("webdriver.chrome.driver", "D:\\chromedriver-win64\\chromedriver.exe");
+        String driverPath = Paths.get("src/test/resources/chromedriver.exe").toAbsolutePath().toString();
+        System.setProperty("webdriver.chrome.driver", driverPath);
+     //   System.setProperty("webdriver.chrome.driver", "D:\\chromedriver-win64\\chromedriver.exe");
         //   Use WebDriverManager to avoid hardcoded path
         //without open just run background
 //        ChromeOptions options = new ChromeOptions();
