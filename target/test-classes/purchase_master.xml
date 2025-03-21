@@ -1,17 +1,17 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="AutomationSuite">
     <listeners>
-        <listener class-name="org.example.Listener.AllTestListener" />
+        <listener class-name="org.test_automation.Listener.AllTestListener" />
     </listeners>
 
     <test name="LoginTests">
         <classes>
-            <class name="org.example.PharmacyMaster.ItemCategoryScenario"></class>
-            <class name="org.example.PharmacyMaster.BrandTestScenario"></class>
-            <class name="org.example.PharmacyMaster.UOMTestScenario"></class>
-            <class name="org.example.PharmacyMaster.SuppilerTestScenario"></class>
-            <class name="org.example.PharmacyMaster.ItemTestScenario"/>
-            <class name="org.example.PharmacyMaster.PharmacyCrudSync"></class>
+            <class name="org.test_automation.PharmacyMaster.ItemCategoryScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.BrandTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.UOMTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.SuppilerTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.ItemTestScenario"/>
+            <class name="org.test_automation.PharmacyMaster.PharmacyCrudSync"></class>
         </classes>
     </test>
 </suite>
