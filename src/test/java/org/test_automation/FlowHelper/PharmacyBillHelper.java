@@ -383,7 +383,7 @@ public class PharmacyBillHelper {
             ));
             selectedOption.click();
         } else {
-            for (char c = 'S'; c <= 'Z'; c++) {
+            for (char c = 'P'; c <= 'Z'; c++) {
                 // Clear the input field and enter the current letter
                 medicineInput.clear();
                 medicineInput.sendKeys(String.valueOf(c));
