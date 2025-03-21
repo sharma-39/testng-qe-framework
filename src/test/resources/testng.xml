@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="AutomationSuite">
+    <listeners>
+        <listener class-name="org.example.Listener.AllTestListener" />
+    </listeners>
+
+    <test name="LoginTests">
+        <classes>
+            <class name="org.example.LoginUtil.LoginAndLocationTest"></class>
+        </classes>
+    </test>
+</suite>

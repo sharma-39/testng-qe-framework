@@ -1,0 +1,45 @@
+{
+  "stock": {
+    "supplier": {
+      "name": "ABC Pharma Pvt. Ltd.",
+      "id": "1329"
+    },
+    "invoiceNumber": "123",
+    "invoiceDate": "05-03-2025",
+    "grnDate": "05-04-2025",
+    "cashDiscount": 20,
+    "tcs": 5,
+    "items": [
+      {
+        "name": "Sevoflurane",
+        "description": "Sevoflurane Inhalation 10 Bottle",
+        "batchNumber": "BATCH12345",
+        "expiryMonth": "03",
+        "expiryYear": "2030",
+        "purchaseUomIndex": 2,
+        "qtyPerPackage": 5,
+        "purchaseQuantity": 10,
+        "mrp": 100,
+        "purchaseRate": 500,
+        "purchaseDiscount": 10,
+        "gst": 18,
+        "edit": false
+      },
+      {
+        "name": "Hydroxyzine",
+        "description": "Hydroxyzine Tablet 10mg 10mg Tablets",
+        "batchNumber": "BATCH129993",
+        "expiryMonth": "03",
+        "expiryYear": "2030",
+        "purchaseUomIndex": 2,
+        "qtyPerPackage": 5,
+        "purchaseQuantity": 10,
+        "mrp": 100,
+        "purchaseRate": 500,
+        "purchaseDiscount": 10,
+        "gst": 18,
+        "edit": true
+      }
+    ]
+  }
+}

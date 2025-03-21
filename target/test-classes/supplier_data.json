@@ -1,0 +1,29 @@
+[
+  {
+    "supplierCodePrefix": "SUP",
+    "supplierNamePrefix": "Supplier",
+    "drugLicensePrefix": "DRUG",
+    "phone": {
+      "countryCode": "91",
+      "phoneNumber": "9791310502"
+    },
+    "emailDomain": "example.com",
+    "fax": "22389233",
+    "gstNumber": "121344",
+    "address": {
+      "street": "77 West Street",
+      "location": "Srinivasonnalur, Kumbakonam",
+      "state": "Tamil Nadu",
+      "city": "Kumbakonam",
+      "zipCode": "612204"
+    },
+    "website": "www.google.com",
+    "pointOfContact": {
+      "name": "Supplier M",
+      "phone": {
+        "countryCode": "91",
+        "pointPhNumber": "9791310502"
+      }
+    }
+  }
+]
