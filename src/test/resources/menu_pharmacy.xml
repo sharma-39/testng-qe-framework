@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="AutomationSuite">
+<suite name="AutomationSuite" parallel="false" >
     <listeners>
         <listener class-name="org.test_automation.Listener.AllTestListener" />
     </listeners>
@@ -7,6 +7,7 @@
     <test name="LoginTests">
         <classes>
             <class name="org.test_automation.PharmacyBill.PharmacyOutOfStockFindPurchase"></class>
+            <class name="org.test_automation.TapPharmacy.SalesReturn"></class>
         </classes>
     </test>
 </suite>

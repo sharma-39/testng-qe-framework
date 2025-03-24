@@ -6,6 +6,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -14,96 +15,121 @@ import java.util.List;
 
 public class LoginAndLocationTest extends BaseTest {
 
+    public Boolean isAlreadyLogin = false;
+
+    @BeforeClass
+    public void setUp() {
+
+        if (loginTextInPanel("Welcome")) {
+            isAlreadyLogin = true;
+        } else {
+            isLoginSuccessful = false;
+        }
+    }
+
+    private boolean loginTextInPanel(String expectedText) {
+        try {
+            WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//span[text()='Welcome']")
+            ));
+            System.out.println("Texting found: " + breadcrumb.getText());
+            if (breadcrumb.getText().contains(expectedText)) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
 
     @Test(priority = 1)
     public void testLogin() {
 
-        for (int i = 0; i < userDetails.size(); i++) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            WebElement resultElement=null;
-
-
-            for (int attempt = 1; attempt <= 5; attempt++) {
-                System.out.println("Attempt " + attempt + " for user: " + userDetails.get(i).getUserName());
-
-                WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("signin-email")));
-                WebElement passwordField = driver.findElement(By.id("signin-password"));
-                WebElement loginButton = driver.findElement(By.cssSelector("button[type='submit']"));
-
-                typeSlowly(usernameField, userDetails.get(i).getUserName(), 200);
-                typeSlowly(passwordField, userDetails.get(i).getPassword(), 200);
-                loginButton.click();
-
-
-               resultElement = wait.until(driver -> {
-                    List<By> locators = Arrays.asList(
-                            By.xpath("//span[text()='Welcome']"),
-                            By.xpath("//p[normalize-space(text())='Select Your Location']"),
-                            By.xpath("//p[contains(text(),'Your account has been temporarily locked')]"),
-                            By.xpath("//p[contains(text(),'Username or Password entered is incorrect')]"),
-                            By.xpath("//div[contains(@class, 'container-2')]/p[contains(text(),'Invalid Username')]")
-                    );
-
-                    for (By locator : locators) {
-                        List<WebElement> elements = driver.findElements(locator);
-                        if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
-                            //System.out.println("Elemenets"+elements.toString());
-                            return elements.get(0);
-                        }
-                    }
-                    return null;
-                });
-
-               // System.out.println("==================result set "+resultElement+""+resultElement.getText().trim()+"================");
-                if (resultElement != null) {
-                    String resultText = resultElement.getText().trim();
-
-                    if (resultText.contains("Select Your Location")) {
-                        System.out.println("Login Successfully");
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
-
-                        isLoginSuccessful=true;
-                        break;
-                    } else if (resultText.contains("temporarily locked")) {
-                        System.out.println("Account Locked: " + resultText);
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Locked");
-                        break;
-                    } else if(resultText.contains("Username or Password entered is incorrect")) {
-                        System.out.println("Login failed: " + resultText);
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Failed (Attempt " + attempt + ")");
-                    } else if (resultText.contains("Invalid Username")) {
-
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Failed (Attempt " + attempt + ")");
-                        break;
-                    }
-                    else if(resultText.contains("Welcome"))
-                    {
-                        isSingleLocation=true;
-                        isLoginSuccessful=true;
-                        System.out.println("Login Successfully Welcome");
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
-                        break;
-                    }
-                    else {
-                        isSingleLocation=true;
-                        isLoginSuccessful=true;
-                        System.out.println("Login Successfully");
-                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
-                        isLoginSuccessful=true;
-                        break;
-                    }
-                } else {
-                    System.out.println("No success or error message found.");
-                    DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "No success or error message", "Unknown");
+        if (!isAlreadyLogin) {
+            for (int i = 0; i < userDetails.size(); i++) {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+                WebElement resultElement = null;
 
+
+                for (int attempt = 1; attempt <= 5; attempt++) {
+                    System.out.println("Attempt " + attempt + " for user: " + userDetails.get(i).getUserName());
+
+                    WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("signin-email")));
+                    WebElement passwordField = driver.findElement(By.id("signin-password"));
+                    WebElement loginButton = driver.findElement(By.cssSelector("button[type='submit']"));
+
+                    typeSlowly(usernameField, userDetails.get(i).getUserName(), 200);
+                    typeSlowly(passwordField, userDetails.get(i).getPassword(), 200);
+                    loginButton.click();
+
+
+                    resultElement = wait.until(driver -> {
+                        List<By> locators = Arrays.asList(
+                                By.xpath("//span[text()='Welcome']"),
+                                By.xpath("//p[normalize-space(text())='Select Your Location']"),
+                                By.xpath("//p[contains(text(),'Your account has been temporarily locked')]"),
+                                By.xpath("//p[contains(text(),'Username or Password entered is incorrect')]"),
+                                By.xpath("//div[contains(@class, 'container-2')]/p[contains(text(),'Invalid Username')]")
+                        );
+
+                        for (By locator : locators) {
+                            List<WebElement> elements = driver.findElements(locator);
+                            if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+                                //System.out.println("Elemenets"+elements.toString());
+                                return elements.get(0);
+                            }
+                        }
+                        return null;
+                    });
+
+                    // System.out.println("==================result set "+resultElement+""+resultElement.getText().trim()+"================");
+                    if (resultElement != null) {
+                        String resultText = resultElement.getText().trim();
+
+                        if (resultText.contains("Select Your Location")) {
+                            System.out.println("Login Successfully");
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
+
+                            isLoginSuccessful = true;
+                            break;
+                        } else if (resultText.contains("temporarily locked")) {
+                            System.out.println("Account Locked: " + resultText);
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Locked");
+                            break;
+                        } else if (resultText.contains("Username or Password entered is incorrect")) {
+                            System.out.println("Login failed: " + resultText);
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Failed (Attempt " + attempt + ")");
+                        } else if (resultText.contains("Invalid Username")) {
+
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), resultText, "Failed (Attempt " + attempt + ")");
+                            break;
+                        } else if (resultText.contains("Welcome")) {
+                            isSingleLocation = true;
+                            isLoginSuccessful = true;
+                            System.out.println("Login Successfully Welcome");
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
+                            break;
+                        } else {
+                            isSingleLocation = true;
+                            isLoginSuccessful = true;
+                            System.out.println("Login Successfully");
+                            DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "Login Successfully", "Success");
+                            isLoginSuccessful = true;
+                            break;
+                        }
+                    } else {
+                        System.out.println("No success or error message found.");
+                        DBUtil.userNameValidation(userDetails.get(i).getUserName(), userDetails.get(i).getPassword(), "No success or error message", "Unknown");
+                    }
+
+                }
             }
         }
-
 
 
     }
@@ -118,11 +144,15 @@ public class LoginAndLocationTest extends BaseTest {
 
     @Test(priority = 2, dependsOnMethods = {"testLogin"})
     public void testLocationSelection() {
+        if (isAlreadyLogin) {
+            isLoginSuccessful = true;
+            isSingleLocation = true;
+        }
         if (!isLoginSuccessful) {
             System.out.println("⛔ Skipping location selection as login failed.");
             return;
         }
-        if(!isSingleLocation) {
+        if (!isSingleLocation) {
 
             System.out.println("✅ Proceeding to Location Selection");
             wait = new WebDriverWait(driver, Duration.ofSeconds(40));
@@ -151,7 +181,7 @@ public class LoginAndLocationTest extends BaseTest {
                                 By.xpath("//span[contains(text(),'Welcome')]"));
                         if (welcomeText.isDisplayed()) {
                             isWelcomeFound = true;
-                            isDashboardLoaded=true;
+                            isDashboardLoaded = true;
                         }
                     } catch (NoSuchElementException e) {
                         Thread.sleep(500);
@@ -164,10 +194,9 @@ public class LoginAndLocationTest extends BaseTest {
             } catch (Exception e) {
                 System.out.println("⚠️ Unexpected error: " + e.getMessage());
             }
-        }
-        else {
-            isLoginSuccessful=true;
-            isSingleLocation=true;
+        } else {
+            isLoginSuccessful = true;
+            isSingleLocation = true;
         }
 
     }

@@ -315,8 +315,8 @@ public class PharmacyBillHelper {
         String prescriptionSelect = patient.getString("prescriptionSelect");
         try {
 
-            searchButtonClick(driver, wait);
-            searchFieldPatientCode(patientCode, wait, driver);
+            baseTest.filterSearchClick();
+            baseTest.filterSearchPatientCode(patientCode);
             WebElement patientRow = findAndClickDropdownAndPrescription(patientCode, wait, driver);
             if (patientRow != null) {
 
@@ -335,7 +335,7 @@ public class PharmacyBillHelper {
 
                     count = i;
                     count = count + 2;
-                    addPrescriptionItems(wait, "auto", search.get(i), select.get(i), count);
+                    addPrescriptionItems(wait, "auto", search.get(i), select.get(i), count, baseTest);
                     WebElement quantityInput = wait.until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//input[@type='number' and @title='Quantity']")
 
@@ -359,12 +359,13 @@ public class PharmacyBillHelper {
 
 
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
     }
 
-    private void addPrescriptionItems(WebDriverWait wait, String type, String search, String select, int selectitem) {
+    private void addPrescriptionItems(WebDriverWait wait, String type, String search, String select, int selectitem, BaseTest baseTest) {
 
         WebElement medicineInput = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//input[@placeholder='Enter Medicine']")
@@ -382,6 +383,9 @@ public class PharmacyBillHelper {
                     By.xpath("//mat-option//span[contains(text(),'" + select + "')]")
             ));
             selectedOption.click();
+            String fullText = selectedOption.getText();
+            System.out.println("itemList:--"+fullText);
+
         } else {
             for (char c = 'P'; c <= 'Z'; c++) {
                 // Clear the input field and enter the current letter
@@ -403,6 +407,8 @@ public class PharmacyBillHelper {
                 // If options are found, click on the first one and exit the loop
                 if (!dynamicOptions.isEmpty()) {
                     dynamicOptions.get(selectitem).click();
+
+                    //baseTest.itemList.add(fullText);
                     break; // Exit the loop after clicking the first option for the letter
                 }
             }
@@ -503,52 +509,4 @@ public class PharmacyBillHelper {
     }
 
 
-    private void searchButtonClick(WebDriver driver, WebDriverWait wait) {
-
-
-// Wait until the button is clickable
-        WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//button[@title='Search']")
-        ));
-
-// Scroll into view
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", searchButton);
-        try {
-            Thread.sleep(500); // Small wait for smooth UI
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-// Click the button using JavaScript to avoid interception issues
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", searchButton);
-    }
-
-
-    private void searchFieldPatientCode(String patientCode, WebDriverWait wait, WebDriver driver) {
-
-// Wait for the input field inside the "Patient Code" column
-        WebElement patientCodeInput = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//th[@title='Patient Code']//input[contains(@class, 'form-control')]")
-        ));
-
-// Scroll into view (if needed)
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", patientCodeInput);
-        try {
-            Thread.sleep(500); // Small delay for UI adjustment
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-// Clear any existing text and enter new value
-        patientCodeInput.clear();
-        patientCodeInput.sendKeys(patientCode); // Replace with actual Patient Code
-
-        patientCodeInput.sendKeys(Keys.ENTER);
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

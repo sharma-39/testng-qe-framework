@@ -87,8 +87,8 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
         System.out.println("Total Pages: " + totalPages);
         System.out.println("Patient Code: " + patientCode);
 
-        searchButtonClick();
-        searchFieldPatientCode(patientCode);
+        filterSearchClick();
+        filterSearchPatientCode(patientCode);
 
         System.out.println("Successfully selected");
         // Find the row with the patient code and process billing

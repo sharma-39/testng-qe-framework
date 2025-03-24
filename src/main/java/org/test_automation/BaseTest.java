@@ -7,8 +7,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +16,11 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BaseTest {
 
-    protected WebDriver driver;
+    protected static WebDriver driver; // Static WebDriver to share across classes
     protected WebDriverWait wait;
     protected boolean isLoginSuccessful = false;
     protected boolean isSingleLocation = false;
@@ -32,24 +32,67 @@ public class BaseTest {
     protected Boolean isAgeInYear = false;
     protected List<UserDetails> userDetails = new ArrayList<>();
 
+    public Integer billNumber=null;
+
+    private static String patientSearchCode = null;
+    private static final ReentrantLock patientSearchLock = new ReentrantLock();
+
+    /* ========== Thread-Safe Patient Search Code Methods ========== */
+
+    /**
+     * Sets the patient search code in a thread-safe manner
+     * @param code The patient code to set
+     */
+    public static void setPatientSearchCode(String code) {
+        System.out.println("set function"+code);
+        patientSearchLock.lock();
+        try {
+            System.out.println("[DEBUG] Setting patientSearchCode to: " + code +
+                    " (Thread: " + Thread.currentThread().getId() + ")");
+            patientSearchCode = code;
+        } finally {
+            patientSearchLock.unlock();
+        }
+    }
+
+    /**
+     * Gets the current patient search code in a thread-safe manner
+     * @return The current patient search code
+     */
+    public static String getPatientSearchCode() {
+        patientSearchLock.lock();
+        try {
+            System.out.println("[DEBUG] Getting patientSearchCode: " + patientSearchCode +
+                    " (Thread: " + Thread.currentThread().getId() + ")");
+            return patientSearchCode;
+        } finally {
+            patientSearchLock.unlock();
+        }
+    }
+
+    @BeforeSuite
+    public void setUpSuite() {
+        // Initialize WebDriver and perform login only once
+        if (driver == null) { // Ensure initialization happens only once
+            String env = ConfigReader.getProperty("env");
+            String baseUrl = ConfigReader.getProperty("url." + env);
+            String driverPath = Paths.get("src/test/resources/chromedriver.exe").toAbsolutePath().toString();
+            System.setProperty("webdriver.chrome.driver", driverPath);
+            driver = new ChromeDriver();
+            driver.manage().window().maximize();
+            driver.get(baseUrl);
+            wait = new WebDriverWait(driver, Duration.ofSeconds(55));
+
+            // Perform login logic here
+            System.out.println("Logging in... (BeforeSuite)");
+            isLoginSuccessful = true; // Mark login as successful
+            clearPatientSearchCode();
+        }
+    }
+
     @BeforeClass
-    public void setUp() {
-        String env = ConfigReader.getProperty("env");
-        String baseUrl = ConfigReader.getProperty("url." + env);
-        String driverPath = Paths.get("src/test/resources/chromedriver.exe").toAbsolutePath().toString();
-        System.setProperty("webdriver.chrome.driver", driverPath);
-     //   System.setProperty("webdriver.chrome.driver", "D:\\chromedriver-win64\\chromedriver.exe");
-        //   Use WebDriverManager to avoid hardcoded path
-        //without open just run background
-//        ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless"); // Run in Jenkins without GUI
-//        options.addArguments("--no-sandbox");
-//        options.addArguments("--disable-dev-shm-usage");
-//        driver = new ChromeDriver(options);
-// local and open chrome and testing
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.get(baseUrl);
+    public void setUpClass() {
+        // Set up class-specific configurations
         wait = new WebDriverWait(driver, Duration.ofSeconds(55));
 
         try {
@@ -59,21 +102,30 @@ public class BaseTest {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(new File("src/test/resources/stockData.json"));
-            tempStockData= jsonNode;
+            tempStockData = jsonNode;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         userDetails = List.of(
-//                new UserDetails("incorrectUsername", "correctPassword"), // Username Incorrect
-//                new UserDetails("FAC-973-support", "incorrectPassword"), // Username and Password Incorrect
-//                new UserDetails("Sharma", "correctPassword") ,
-//                new UserDetails("scott", "scott")
                 new UserDetails("FAC-989-support", "Admin@123")
-                // Account Locked (after multiple attempts)
         );
 
         ageLabel.add("Age In Years And Months");
         ageLabel.add("Age In Years");
+    }
+
+    @AfterClass
+    public void tearDownClass() {
+        // Clean up class-specific resources
+    }
+
+    @AfterSuite
+    public void tearDownSuite() {
+        // Close the browser after the entire suite
+        if (driver != null) {
+            //  driver.quit();
+        }
     }
 
     public void threadTimer(long milliseconds) {
@@ -85,7 +137,7 @@ public class BaseTest {
     }
 
     public void menuPanelClick(String panel, Boolean subPanel, String subPanelName, String screenCheck) {
-        if(screenCheck.isEmpty()) {
+        if (screenCheck.isEmpty()) {
             wait = new WebDriverWait(driver, Duration.ofSeconds(50));
             threadTimer(3000);
             WebElement menuButton = driver.findElement(By.id("mega-menu-nav-btn"));
@@ -99,18 +151,16 @@ public class BaseTest {
 
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("page-loader-wrapper")));
 
-
-            System.out.println("Parent panel Name" + panel);
+            System.out.println("Parent panel Name: " + panel);
 
             if (subPanel) {
-
                 // Step 1: Click "Master" to Expand the Dropdown
                 WebElement masterMenu = wait.until(ExpectedConditions.elementToBeClickable(
                         By.xpath("//a[normalize-space()='" + panel + "']")));
                 masterMenu.click();
-                System.out.println("✅ Clicked on Master");
+                System.out.println("✅ Clicked on " + panel);
 
-// Step 2: Click "Pharmacy" Inside the Dropdown
+                // Step 2: Click "Pharmacy" Inside the Dropdown
                 WebElement pharmacyLink = wait.until(ExpectedConditions.elementToBeClickable(
                         By.xpath("//ul[contains(@class, 'show-submenu')]//a[normalize-space()='" + subPanelName + "']")));
 
@@ -125,9 +175,7 @@ public class BaseTest {
                     js.executeScript("arguments[0].click();", pharmacyLink);
                 }
 
-                System.out.println("✅ Clicked on Pharmacy");
-
-
+                System.out.println("✅ Clicked on " + subPanelName);
             } else {
                 WebElement panelClick = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[contains(text(),'" + panel + "')]")));
 
@@ -135,21 +183,26 @@ public class BaseTest {
                 js.executeScript("arguments[0].style.border='3px solid red';", panelClick); // Highlight
                 js.executeScript("arguments[0].scrollIntoView(true);", panelClick);
                 panelClick.click();
-                System.out.println("✅ Panel Click :-" + panel);
+                System.out.println("✅ Panel Click: " + panel);
             }
-        }
-
-        else {
+        } else {
             verifyPanelName(screenCheck);
         }
-
     }
 
-    protected void verifyPanelName(String expectedText) {
-        WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//li[@class='breadcrumb-item active breadcrums-data' and normalize-space()='" + expectedText + "']")
-        ));
-        System.out.println("Breadcrumb found: " + breadcrumb.getText());
+    protected Boolean verifyPanelName(String expectedText) {
+        try {
+            WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//li[@class='breadcrumb-item active breadcrums-data' and normalize-space()='" + expectedText + "']")
+            ));
+            System.out.println("Breadcrumb found: " + breadcrumb.getText());
+            if (breadcrumb.getText().contains(expectedText)) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
     public WebElement warningMessagePurchase() {
@@ -179,22 +232,76 @@ public class BaseTest {
         return driver.findElements(By.xpath("//div[contains(@class, 'error-msg')]"));
     }
 
-
-    @AfterClass
-    public void tearDown() {
-       // driver.quit();
-    }
-
     public void clickButtonElement(By locator) {
-
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
             element.click();
         } catch (Exception e) {
-            //System.out.println("Normal click failed, using JavaScript click...");
+            System.out.println("Normal click failed, using JavaScript click...");
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", driver.findElement(locator));
+        }
+    }
 
+
+
+    public void filterSearchClick() {
+
+
+// Wait until the button is clickable
+        WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@title='Search']")
+        ));
+
+// Scroll into view
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", searchButton);
+        try {
+            Thread.sleep(500); // Small wait for smooth UI
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
+// Click the button using JavaScript to avoid interception issues
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", searchButton);
+    }
+
+
+    public void filterSearchPatientCode(String patientCode) {
+
+// Wait for the input field inside the "Patient Code" column
+        WebElement patientCodeInput = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//th[@title='Patient Code']//input[contains(@class, 'form-control')]")
+        ));
+
+// Scroll into view (if needed)
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", patientCodeInput);
+        try {
+            Thread.sleep(500); // Small delay for UI adjustment
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+// Clear any existing text and enter new value
+        patientCodeInput.clear();
+        patientCodeInput.sendKeys(patientCode); // Replace with actual Patient Code
+
+        patientCodeInput.sendKeys(Keys.ENTER);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void clearPatientSearchCode() {
+        patientSearchLock.lock();
+        try {
+            System.out.println("[DEBUG] Clearing patientSearchCode" +
+                    " (Thread: " + Thread.currentThread().getId() + ")");
+            patientSearchCode = null;
+        } finally {
+            patientSearchLock.unlock();
+        }
     }
 }

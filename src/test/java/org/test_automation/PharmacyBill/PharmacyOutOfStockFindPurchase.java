@@ -45,6 +45,7 @@ public class PharmacyOutOfStockFindPurchase extends LoginAndLocationTest {
                 // Navigate to the dashboard
                 menuPanelClick("Dashboard", false, "", "");
 
+                setPatientSearchCode(patientCode);
                 if (patientCode != null) {
                     // Create an appointment for the patient
                     isAppointmentCreated = patientFlowHelper.createAppointment(this, patient, driver, wait, "Create Appointment", patientCode);
@@ -73,6 +74,10 @@ public class PharmacyOutOfStockFindPurchase extends LoginAndLocationTest {
 
                                     System.out.println("Successfully added Completed Purchase flow");
                                     pharmacyBillHelper.addPharmacyBill(this, patientCode, driver, wait, "Pharmacy");
+
+                                    System.out.println("set this patient code"+patientCode);
+
+
 
                                 }
                             } else {
