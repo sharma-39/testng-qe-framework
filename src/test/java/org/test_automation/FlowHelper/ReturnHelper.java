@@ -4,11 +4,9 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.BaseTest;
-import org.test_automation.TapPharmacy.SalesReturn;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
