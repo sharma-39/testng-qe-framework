@@ -11,8 +11,8 @@
     "tcs": 5,
     "items": [
       {
-        "name": "Sevoflurane",
-        "description": "Sevoflurane Inhalation 10 Bottle",
+        "name": "SAAZ-DS",
+        "description": "SAAZ-DS Tablet",
         "batchNumber": "BATCH12345",
         "expiryMonth": "03",
         "expiryYear": "2030",
@@ -26,8 +26,8 @@
         "edit": false
       },
       {
-        "name": "Hydroxyzine",
-        "description": "Hydroxyzine Tablet 10mg 10mg Tablets",
+        "name": "SETCART",
+        "description": "SETCART Tablet",
         "batchNumber": "BATCH129993",
         "expiryMonth": "03",
         "expiryYear": "2030",

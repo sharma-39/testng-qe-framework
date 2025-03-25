@@ -69,7 +69,7 @@ public class PharmacyOutOfStockFindPurchase extends LoginAndLocationTest {
                                     threadTimer(3000);
                                     driver.navigate().refresh();
 
-                                    purchaseFlowHelper.addStockPurchase(this, items, driver, wait, "Pharmacy", tempStockData);
+                                    purchaseFlowHelper.addStockPurchase(this, items, driver, wait, "Pharmacy", tempStockData, "custom");
 
 
                                     System.out.println("Successfully added Completed Purchase flow");

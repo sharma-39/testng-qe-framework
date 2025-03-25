@@ -19,7 +19,6 @@ public class LoginAndLocationTest extends BaseTest {
 
     @BeforeClass
     public void setUp() {
-
         if (loginTextInPanel("Welcome")) {
             isAlreadyLogin = true;
         } else {
@@ -29,13 +28,21 @@ public class LoginAndLocationTest extends BaseTest {
 
     private boolean loginTextInPanel(String expectedText) {
         try {
-            WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.xpath("//span[text()='Welcome']")
+            // Wait for visibility of all matching elements
+            List<WebElement> elements = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
+                    By.xpath("//span[contains(text(),'Welcome') or contains(text(),'Login')]")
             ));
-            System.out.println("Texting found: " + breadcrumb.getText());
-            if (breadcrumb.getText().contains(expectedText)) {
-                return true;
+
+// Iterate through the list
+            for (WebElement element : elements) {
+                System.out.println("Texting found: " + element.getText());
+                if (element.getText().contains("Welcome")) {
+                    return true;
+                } else if (element.getText().contains("Login")) {
+                    return false;
+                }
             }
+
         } catch (Exception e) {
             return false;
         }

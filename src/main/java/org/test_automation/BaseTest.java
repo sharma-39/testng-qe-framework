@@ -190,7 +190,7 @@ public class BaseTest {
         }
     }
 
-    protected Boolean verifyPanelName(String expectedText) {
+    public Boolean verifyPanelName(String expectedText) {
         try {
             WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//li[@class='breadcrumb-item active breadcrums-data' and normalize-space()='" + expectedText + "']")

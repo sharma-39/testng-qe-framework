@@ -20,7 +20,7 @@ import java.util.Random;
 
 public class PurchaseFlowHelper {
 
-    public void addStockPurchase(BaseTest baseTest, List<String> items, WebDriver driver, WebDriverWait wait, String pharmacy, JsonNode stockData) {
+    public void addStockPurchase(BaseTest baseTest, List<String> items, WebDriver driver, WebDriverWait wait, String pharmacy, JsonNode stockData, String type) {
 
         baseTest.menuPanelClick("Stock", true, "Purchase", "");
         //add stock
@@ -45,7 +45,7 @@ public class PurchaseFlowHelper {
 
 
         baseTest.clickButtonElement(By.xpath("//div[contains(@class, 'addIcon-button')]"));
-        if (items.size() == 0) {
+        if (items.size() == 0 ) {
             for (int i = 0; i < stockData.get("stock").get("items").size(); i++) {
 
                 addStockDetails(stockData.get("stock").get("items").get(i), wait, baseTest, driver, "auto", null);
