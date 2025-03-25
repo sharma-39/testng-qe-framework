@@ -163,7 +163,6 @@ public class PurchaseReturn extends LoginAndLocationTest {
     public void purchaseReturnPaid() {
         menuPanelClick("Returns", true, "Purchase Returns", "");
         threadTimer(3000);
-        purchaseSupplierName = "Supplier 67";
         WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//td[span[contains(text(),'" + purchaseSupplierName + "')]]/parent::tr")
         )));
