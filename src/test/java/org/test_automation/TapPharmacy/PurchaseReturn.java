@@ -52,112 +52,112 @@ public class PurchaseReturn extends LoginAndLocationTest {
         };
     }
 
-//    @Test(priority = 4, dataProvider = "supplierData")
-//    public void addSupplierData(SupplierDTO supplierData) {
-//        System.out.println("Process Create Pharmacy Supplier flow---");
-//        String supplierName = returnHelper.addSupplier(this, supplierData, wait, driver);
-//        System.out.println("Supplier created with code: " + supplierName);
-//        System.out.println("Completed Create Pharmacy Supplier flow---");
-//        purchaseSupplierName = supplierName;
-//    }
-//
-//    @Test(priority = 5)
-//    public void addPurchase() {
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//
-//        try {
-//            // First, log the input to verify what we're actually receiving
-//            System.out.println("Raw input data: " + tempStockData);
-//
-//            // Parse JSON string to JsonNode
-//            JsonNode rootNode = objectMapper.readTree(String.valueOf(tempStockData));
-//            // Create a deep copy first if you need to keep the original
-//
-//            // Debug: print the entire parsed structure
-//            System.out.println("Parsed JSON structure: " + rootNode.toPrettyString());
-//
-//            // Check if root is an object (sometimes JSON might be just an array)
-//            if (!rootNode.isObject()) {
-//                throw new RuntimeException("Root node is not an object");
-//            }
-//
-//            // Get the stock node with better error reporting
-//            JsonNode stockNode = rootNode.get("stock");
-//            if (stockNode == null) {
-//                throw new RuntimeException("'stock' node is missing. Available fields: " +
-//                        rootNode.fieldNames());
-//            }
-//            if (!stockNode.isObject()) {
-//                throw new RuntimeException("'stock' node is not an object");
-//            }
-//
-//            ObjectNode stockObjectNode = (ObjectNode) stockNode;
-//
-//            // 4. Process supplier with null-safe approach
-//            JsonNode supplierNode = stockObjectNode.path("supplier");
-//            if (supplierNode.isMissingNode()) {
-//                throw new RuntimeException("'supplier' node is missing in stock");
-//            }
-//            if (!supplierNode.isObject()) {
-//                throw new RuntimeException("'supplier' should be an object");
-//            }
-//
-//            // 5. Update supplier name while preserving other fields
-//            ObjectNode supplierObjectNode = (ObjectNode) supplierNode;
-//            supplierObjectNode.put("name", purchaseSupplierName);
-//
-//            // 6. Process items array
-//            JsonNode itemsNode = stockObjectNode.path("items");
-//            if (itemsNode.isMissingNode()) {
-//                throw new RuntimeException("'items' array is missing in stock");
-//            }
-//            if (!itemsNode.isArray()) {
-//                throw new RuntimeException("'items' should be an array");
-//            }
-//
-//
-//
-//            System.out.println("Parsed Modified JSON structure: " + rootNode.toPrettyString());
-//            // Call your helper method
-//            purchaseFlowHelper.addStockPurchase(
-//                    this,
-//                    new ArrayList<>(),
-//                    driver,
-//                    wait,
-//                    "Pharmacy",
-//                   rootNode,
-//                    "custom");
-//
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException("JSON processing error: " + e.getMessage(), e);
-//        } catch (IOException e) {
-//            throw new RuntimeException("IO error: " + e.getMessage(), e);
-//        }
-//
-//    }
+    @Test(priority = 4, dataProvider = "supplierData")
+    public void addSupplierData(SupplierDTO supplierData) {
+        System.out.println("Process Create Pharmacy Supplier flow---");
+        String supplierName = returnHelper.addSupplier(this, supplierData, wait, driver);
+        System.out.println("Supplier created with code: " + supplierName);
+        System.out.println("Completed Create Pharmacy Supplier flow---");
+        purchaseSupplierName = supplierName;
+    }
+
+    @Test(priority = 5)
+    public void addPurchase() {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            // First, log the input to verify what we're actually receiving
+            System.out.println("Raw input data: " + tempStockData);
+
+            // Parse JSON string to JsonNode
+            JsonNode rootNode = objectMapper.readTree(String.valueOf(tempStockData));
+            // Create a deep copy first if you need to keep the original
+
+            // Debug: print the entire parsed structure
+            System.out.println("Parsed JSON structure: " + rootNode.toPrettyString());
+
+            // Check if root is an object (sometimes JSON might be just an array)
+            if (!rootNode.isObject()) {
+                throw new RuntimeException("Root node is not an object");
+            }
+
+            // Get the stock node with better error reporting
+            JsonNode stockNode = rootNode.get("stock");
+            if (stockNode == null) {
+                throw new RuntimeException("'stock' node is missing. Available fields: " +
+                        rootNode.fieldNames());
+            }
+            if (!stockNode.isObject()) {
+                throw new RuntimeException("'stock' node is not an object");
+            }
+
+            ObjectNode stockObjectNode = (ObjectNode) stockNode;
+
+            // 4. Process supplier with null-safe approach
+            JsonNode supplierNode = stockObjectNode.path("supplier");
+            if (supplierNode.isMissingNode()) {
+                throw new RuntimeException("'supplier' node is missing in stock");
+            }
+            if (!supplierNode.isObject()) {
+                throw new RuntimeException("'supplier' should be an object");
+            }
+
+            // 5. Update supplier name while preserving other fields
+            ObjectNode supplierObjectNode = (ObjectNode) supplierNode;
+            supplierObjectNode.put("name", purchaseSupplierName);
+
+            // 6. Process items array
+            JsonNode itemsNode = stockObjectNode.path("items");
+            if (itemsNode.isMissingNode()) {
+                throw new RuntimeException("'items' array is missing in stock");
+            }
+            if (!itemsNode.isArray()) {
+                throw new RuntimeException("'items' should be an array");
+            }
 
 
-//    @Test(priority = 5)
-//    public void addPurchaseReturn() {
-//
-//        System.out.println("Raw input data: " + tempStockData);
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        // Parse JSON string to JsonNode
-//        JsonNode rootNode = null;
-//        try {
-//            rootNode = objectMapper.readTree(String.valueOf(tempStockData));
-//        } catch (JsonProcessingException e) {
-//
-//        }
-//
-//        System.out.println("Raw input data: " + rootNode.toPrettyString());
-//        System.out.println("items"+rootNode.get("stock").get("items").toPrettyString());
-//        returnHelper.createPurchaseReturnBill(this, driver, wait, "Returns", "Purchase Returns", purchaseSupplierName,rootNode.get("stock").get("items"));
-//
-//        System.out.println("Successfully completed purchase return");
-//    }
+
+            System.out.println("Parsed Modified JSON structure: " + rootNode.toPrettyString());
+            // Call your helper method
+            purchaseFlowHelper.addStockPurchase(
+                    this,
+                    new ArrayList<>(),
+                    driver,
+                    wait,
+                    "Pharmacy",
+                   rootNode,
+                    "custom");
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON processing error: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RuntimeException("IO error: " + e.getMessage(), e);
+        }
+
+    }
+
+
+    @Test(priority = 5)
+    public void addPurchaseReturn() {
+
+        System.out.println("Raw input data: " + tempStockData);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        // Parse JSON string to JsonNode
+        JsonNode rootNode = null;
+        try {
+            rootNode = objectMapper.readTree(String.valueOf(tempStockData));
+        } catch (JsonProcessingException e) {
+
+        }
+
+        System.out.println("Raw input data: " + rootNode.toPrettyString());
+        System.out.println("items"+rootNode.get("stock").get("items").toPrettyString());
+        returnHelper.createPurchaseReturnBill(this, driver, wait, "Returns", "Purchase Returns", purchaseSupplierName,rootNode.get("stock").get("items"));
+
+        System.out.println("Successfully completed purchase return");
+    }
 
     @Test(priority = 6)
     public void purchaseReturnPaid() {
