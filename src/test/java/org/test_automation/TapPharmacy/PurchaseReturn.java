@@ -117,7 +117,6 @@ public class PurchaseReturn extends LoginAndLocationTest {
             }
 
 
-
             System.out.println("Parsed Modified JSON structure: " + rootNode.toPrettyString());
             // Call your helper method
             purchaseFlowHelper.addStockPurchase(
@@ -126,7 +125,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
                     driver,
                     wait,
                     "Pharmacy",
-                   rootNode,
+                    rootNode,
                     "custom");
 
         } catch (JsonProcessingException e) {
@@ -138,7 +137,57 @@ public class PurchaseReturn extends LoginAndLocationTest {
     }
 
 
-    @Test(priority = 5)
+    @Test(priority = 5, dependsOnMethods = "menuClick")
+    public void addPurchasePayments() {
+
+        menuPanelClick("Purchase Payments", false, "", "");
+        threadTimer(3000);
+        filterSearchClick();
+
+        String supplierName = purchaseSupplierName;
+        filterSearchElemenet(supplierName, "Supplier Name", "Text");
+
+
+        // 1. First ensure the date picker uis open (as per your previous code)
+        WebElement dateRangeDiv = driver.findElement(By.cssSelector("div#purchase-payments1"));
+        dateRangeDiv.click();
+
+        filterRangeSelect("1 Month");
+
+        threadTimer(3000);
+
+//        filterSearchElemenet("05-05-2024","pharmacyinvoiceDate","Date");
+//
+//        filterSearchElemenet("05-01-2025","pharmacygrnDate","Date");
+
+
+        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
+        )));
+
+        row.findElement(By.xpath(".//button[@title='Payment']")).click();
+
+        threadTimer(2000);
+
+        WebElement balanceInput = driver.findElement(By.xpath("//label[text()='Balance Amount']/following-sibling::input"));
+        String balanceValue = balanceInput.getAttribute("value");
+        System.out.println("Balance Amount: " + balanceValue);
+
+        WebElement amountInput = driver.findElement(
+                By.xpath("//label[contains(.,'Amount')]/following::app-input-number//input[@type='number']")
+        );
+
+        threadTimer(1000);
+// Clear and enter value
+        amountInput.sendKeys(balanceValue); // Enter your desired amount
+
+        clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"));
+
+
+    }
+
+
+    @Test(priority = 6)
     public void addPurchaseReturn() {
 
         System.out.println("Raw input data: " + tempStockData);
@@ -153,13 +202,13 @@ public class PurchaseReturn extends LoginAndLocationTest {
         }
 
         System.out.println("Raw input data: " + rootNode.toPrettyString());
-        System.out.println("items"+rootNode.get("stock").get("items").toPrettyString());
-        returnHelper.createPurchaseReturnBill(this, driver, wait, "Returns", "Purchase Returns", purchaseSupplierName,rootNode.get("stock").get("items"));
+        System.out.println("items" + rootNode.get("stock").get("items").toPrettyString());
+        returnHelper.createPurchaseReturnBill(this, driver, wait, "Returns", "Purchase Returns", purchaseSupplierName, rootNode.get("stock").get("items"));
 
         System.out.println("Successfully completed purchase return");
     }
 
-    @Test(priority = 6)
+    @Test(priority = 7)
     public void purchaseReturnPaid() {
         menuPanelClick("Returns", true, "Purchase Returns", "");
         threadTimer(3000);

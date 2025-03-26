@@ -26,7 +26,7 @@ public class PurchasePayments extends LoginAndLocationTest {
         filterSearchElemenet(supplierName, "Supplier Name", "Text");
 
 
-        // 1. First ensure the date picker is open (as per your previous code)
+        // 1. First ensure the date picker uis open (as per your previous code)
         WebElement dateRangeDiv = driver.findElement(By.cssSelector("div#purchase-payments1"));
         dateRangeDiv.click();
 

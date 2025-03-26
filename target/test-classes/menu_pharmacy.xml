@@ -8,7 +8,7 @@
         <classes>
 <!--            <class name="org.test_automation.PharmacyBill.PharmacyOutOfStockFindPurchase"></class>-->
 <!--            <class name="org.test_automation.TapPharmacy.SalesReturn"></class>-->
-            <class name="org.test_automation.TapPharmacy.PurchasePayments"></class>
+            <class name="org.test_automation.TapPharmacy.PurchaseReturn"></class>
 
         </classes>
     </test>
