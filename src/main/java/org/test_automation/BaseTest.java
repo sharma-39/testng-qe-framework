@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.*;
 
@@ -274,7 +275,7 @@ public class BaseTest {
 
 // Wait for the input field inside the "Patient Code" column
         WebElement fieldsElement = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//th[@title='"+searchFiler+"']//input[contains(@class, 'form-control')]")
+                By.xpath("//th[@title='" + searchFiler + "']//input[contains(@class, 'form-control')]")
         ));
 
 // Scroll into view (if needed)
@@ -319,5 +320,26 @@ public class BaseTest {
         WebElement oneMonthElement = wait.until(ExpectedConditions.elementToBeClickable(oneMonthOption));
 
         oneMonthElement.click();
+    }
+
+    public void selectDatePicker(String dateValue)
+    {
+        String[] dateFormat = dateValue.split("-");
+        String dateText = dateFormat[0]; // Day
+        String monthText = dateFormat[1]; // Month (MM)
+        String yearText = dateFormat[2]; // Year (YYYY)
+
+        // Select Year
+        WebElement yearDropdown = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//select[contains(@class, 'yearselect')]"));
+        Select selectYear = new Select(yearDropdown);
+        selectYear.selectByVisibleText(yearText); // Change to required year
+
+        // Change to required month
+        WebElement monthDropdown = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//select[contains(@class, 'monthselect')]"));
+        Select selectMonth = new Select(monthDropdown);
+        selectMonth.selectByVisibleText(monthText);
+        // Select Day
+        WebElement day = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//td[@class='available' and text()='"+Integer.parseInt(dateText)+"']"));
+        day.click();
     }
 }
