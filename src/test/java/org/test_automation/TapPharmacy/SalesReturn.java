@@ -37,7 +37,7 @@ public class SalesReturn extends LoginAndLocationTest {
     private String findBillNumber(String patientCode) {
 
         filterSearchClick();
-        filterSearchElemenet(patientCode, "patientCode");
+        filterSearchElemenet(patientCode, "patientCode", "Text");
         String billNumber = findAndClickDropdownAndPrescription(patientCode, wait, driver);
 
         return billNumber;

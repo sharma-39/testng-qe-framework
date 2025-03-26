@@ -15,8 +15,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class BaseTest {
@@ -271,31 +274,39 @@ public class BaseTest {
     }
 
 
-    public void filterSearchElemenet(String searchValue, String searchFiler) {
+    public void filterSearchElemenet(String searchValue, String searchFiler, String type) {
+
+
+        if (type.equals("Text")) {
 
 // Wait for the input field inside the "Patient Code" column
-        WebElement fieldsElement = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//th[@title='" + searchFiler + "']//input[contains(@class, 'form-control')]")
-        ));
+            WebElement fieldsElement = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//th[@title='" + searchFiler + "']//input[contains(@class, 'form-control')]")
+            ));
 
 // Scroll into view (if needed)
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", fieldsElement);
-        try {
-            Thread.sleep(500); // Small delay for UI adjustment
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", fieldsElement);
+            try {
+                Thread.sleep(500); // Small delay for UI adjustment
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
 // Clear any existing text and enter new value
-        fieldsElement.clear();
-        fieldsElement.sendKeys(searchValue); // Replace with actual Patient Code
+            fieldsElement.clear();
+            fieldsElement.sendKeys(searchValue); // Replace with actual Patient Code
 
-        fieldsElement.sendKeys(Keys.ENTER);
+            fieldsElement.sendKeys(Keys.ENTER);
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            WebElement expiryDateField = driver.findElement(By.id(searchFiler));
+            expiryDateField.click();
+            selectDatePicker(searchValue);
         }
     }
 
@@ -321,25 +332,51 @@ public class BaseTest {
 
         oneMonthElement.click();
     }
-
-    public void selectDatePicker(String dateValue)
-    {
+    public void selectDatePicker(String dateValue) {
+        System.out.println("date value: " + dateValue);
         String[] dateFormat = dateValue.split("-");
-        String dateText = dateFormat[0]; // Day
-        String monthText = dateFormat[1]; // Month (MM)
-        String yearText = dateFormat[2]; // Year (YYYY)
+        String dateText = String.valueOf(Integer.parseInt(dateFormat[0])); // Day
+        String monthText = convertMMToMonth(dateFormat[1]); // Convert MM to Month name
+        String yearText = dateFormat[2]; // Year
+
+        System.out.println("date: " + dateText + " month: " + monthText + " year: " + yearText);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
         // Select Year
-        WebElement yearDropdown = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//select[contains(@class, 'yearselect')]"));
+        WebElement yearDropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.yearselect")));
         Select selectYear = new Select(yearDropdown);
-        selectYear.selectByVisibleText(yearText); // Change to required year
+        selectYear.selectByVisibleText(yearText);
+        System.out.println("Selected Year: " + yearText);
 
-        // Change to required month
-        WebElement monthDropdown = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//select[contains(@class, 'monthselect')]"));
+        // Wait for the month dropdown to be ready
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.yearselect"), yearText));
+
+        // Select Month
+        WebElement monthDropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.monthselect")));
         Select selectMonth = new Select(monthDropdown);
         selectMonth.selectByVisibleText(monthText);
+        System.out.println("Selected Month: " + monthText);
+
+        // Wait for the day picker to refresh
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] td.available")));
+
         // Select Day
-        WebElement day = driver.findElement(By.xpath("//div[@class='daterangepicker' and contains(@style, 'display: block')]//td[@class='available' and text()='"+Integer.parseInt(dateText)+"']"));
-        day.click();
+        List<WebElement> days = driver.findElements(By.cssSelector("div.daterangepicker[style*='display: block'] td.available"));
+        for (WebElement day : days) {
+            System.out.println("get Days"+day.getText());
+            if (day.getText().trim().equals(dateText)) { // Fixing Integer.parseInt issue
+                day.click();
+                System.out.println("Selected Day: " + dateText);
+                break;
+            }
+        }
+        System.out.println("Date selection complete.");
+    }
+
+
+    public String convertMMToMonth(String monthNumber) {
+        int monthInt = Integer.parseInt(monthNumber);
+        return Month.of(monthInt).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
     }
 }

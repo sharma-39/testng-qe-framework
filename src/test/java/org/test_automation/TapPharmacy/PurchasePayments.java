@@ -1,16 +1,10 @@
 package org.test_automation.TapPharmacy;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.testng.annotations.Test;
-
-import java.time.Duration;
-import java.util.List;
 
 public class PurchasePayments extends LoginAndLocationTest {
 
@@ -28,7 +22,7 @@ public class PurchasePayments extends LoginAndLocationTest {
         filterSearchClick();
 
         String supplierName="Supplier 67";
-        filterSearchElemenet(supplierName, "Supplier Name");
+        filterSearchElemenet(supplierName, "Supplier Name", "Text");
 
 
         // 1. First ensure the date picker is open (as per your previous code)
@@ -37,11 +31,22 @@ public class PurchasePayments extends LoginAndLocationTest {
 
         filterRangeSelect("1 Month");
 
-        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
-        )));
+        threadTimer(3000);
 
-        row.findElement(By.xpath(".//button[@title='Payment']")).click();
+        filterSearchClick();
+        threadTimer(2000);
+        filterSearchClick();
+        filterSearchElemenet("05-05-2024","pharmacyinvoiceDate","Date");
+
+        filterSearchElemenet("01-05-2025","pharmacygrnDate","Date");
+
+
+//        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+//                By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
+//        )));
+//
+//        row.findElement(By.xpath(".//button[@title='Payment']")).click();
+
 
 
     }
