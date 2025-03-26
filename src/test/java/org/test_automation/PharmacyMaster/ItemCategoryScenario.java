@@ -178,10 +178,10 @@ public class ItemCategoryScenario extends LoginAndLocationTest {
         clickElement(By.xpath("//button[contains(text(),'Save & Close')]"));
 
         String warningMessage=new String();
-        for (WebElement item : getMantoraryFields()) {
+        for (WebElement item : getMandatoryFields()) {
             warningMessage= item.getText();
         }
-        if (getMantoraryFields().size() == 0) {
+        if (getMandatoryFields().size() == 0) {
             String backendResponse=warningMessagePurchase().getText();
             System.out.println("backend response"+backendResponse);
             if (backendResponse!= null && backendResponse.contains("Successfully")) {

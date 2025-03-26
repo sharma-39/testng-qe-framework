@@ -7,8 +7,6 @@ import org.test_automation.FlowHelper.ReturnHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 public class SalesReturn extends LoginAndLocationTest {
 
     private final ReturnHelper returnHelper;
@@ -39,7 +37,7 @@ public class SalesReturn extends LoginAndLocationTest {
     private String findBillNumber(String patientCode) {
 
         filterSearchClick();
-        filterSearchPatientCode(patientCode);
+        filterSearchElemenet(patientCode, "patientCode");
         String billNumber = findAndClickDropdownAndPrescription(patientCode, wait, driver);
 
         return billNumber;

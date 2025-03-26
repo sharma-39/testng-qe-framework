@@ -410,10 +410,10 @@ public class ItemTestScenario extends LoginAndLocationTest {
 
 
         StringBuilder warningMessage = new StringBuilder();
-        for (WebElement item : getMantoraryFields()) {
+        for (WebElement item : getMandatoryFields()) {
             warningMessage.append(item.getText() + ",");
         }
-        if (getMantoraryFields().size() == 0) {
+        if (getMandatoryFields().size() == 0) {
             String backendResponse = warningMessagePurchase().getText();
             //   System.out.println("backend response" + backendResponse);
             if (backendResponse != null && backendResponse.contains("Successfully")) {

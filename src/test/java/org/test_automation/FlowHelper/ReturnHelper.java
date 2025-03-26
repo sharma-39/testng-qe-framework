@@ -171,7 +171,9 @@ public class ReturnHelper {
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-            element.click();
+            if (element.isEnabled()) {
+                element.click();
+            }
         } catch (Exception e) {
             System.out.println("Normal click failed, using JavaScript click...");
 
@@ -292,15 +294,22 @@ public class ReturnHelper {
                     desc, true, baseTest, wait, driver, "auto");
 
             threadTimer(3000);
-            enterQtyText(By.xpath("//input[@type='number' and @title='Return Qty']"), "50", false, wait,driver);
+            enterQtyText(By.xpath("//input[@type='number' and @title='Return Qty']"), "50", false, wait, driver);
 
             threadTimer(1000);
-            enterQtyText(By.xpath("//input[@type='number' and @title='Return Net Amount']"), "100", false, wait,driver);
+            enterQtyText(By.xpath("//input[@type='number' and @title='Return Net Amount']"), "100", false, wait, driver);
 
             threadTimer(3000);
-            clickElement(By.xpath("//button[contains(text(),'Save & Close')]"), wait);
+            if (baseTest.getMandatoryFields().size() == 0) {
+                clickElement(By.xpath("//button[contains(text(),'Save & Close')]"), wait);
+
+            } else {
+                System.out.println("Already paid this item and return ");
+                baseTest.clickButtonElement(By.xpath("//button[contains(text(), 'Close') and not(contains(text(), 'Save'))]"));
+            }
 
         }
+
         clickElement(By.xpath("//button[contains(text(),'Return')]"), wait);
 
 

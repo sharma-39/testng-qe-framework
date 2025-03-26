@@ -32,7 +32,7 @@ public class BaseTest {
     protected Boolean isAgeInYear = false;
     protected List<UserDetails> userDetails = new ArrayList<>();
 
-    public Integer billNumber=null;
+    public Integer billNumber = null;
 
     private static String patientSearchCode = null;
     private static final ReentrantLock patientSearchLock = new ReentrantLock();
@@ -41,10 +41,11 @@ public class BaseTest {
 
     /**
      * Sets the patient search code in a thread-safe manner
+     *
      * @param code The patient code to set
      */
     public static void setPatientSearchCode(String code) {
-        System.out.println("set function"+code);
+        System.out.println("set function" + code);
         patientSearchLock.lock();
         try {
             System.out.println("[DEBUG] Setting patientSearchCode to: " + code +
@@ -57,6 +58,7 @@ public class BaseTest {
 
     /**
      * Gets the current patient search code in a thread-safe manner
+     *
      * @return The current patient search code
      */
     public static String getPatientSearchCode() {
@@ -228,7 +230,7 @@ public class BaseTest {
         }
     }
 
-    public List<WebElement> getMantoraryFields() {
+    public List<WebElement> getMandatoryFields() {
         return driver.findElements(By.xpath("//div[contains(@class, 'error-msg')]"));
     }
 
@@ -236,14 +238,15 @@ public class BaseTest {
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-            element.click();
+            if (element.isEnabled()) {
+                element.click();
+            }
         } catch (Exception e) {
             System.out.println("Normal click failed, using JavaScript click...");
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", driver.findElement(locator));
         }
     }
-
 
 
     public void filterSearchClick() {
@@ -267,15 +270,15 @@ public class BaseTest {
     }
 
 
-    public void filterSearchPatientCode(String patientCode) {
+    public void filterSearchElemenet(String searchValue, String searchFiler) {
 
 // Wait for the input field inside the "Patient Code" column
-        WebElement patientCodeInput = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//th[@title='Patient Code']//input[contains(@class, 'form-control')]")
+        WebElement fieldsElement = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//th[@title='"+searchFiler+"']//input[contains(@class, 'form-control')]")
         ));
 
 // Scroll into view (if needed)
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", patientCodeInput);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", fieldsElement);
         try {
             Thread.sleep(500); // Small delay for UI adjustment
         } catch (InterruptedException e) {
@@ -283,10 +286,10 @@ public class BaseTest {
         }
 
 // Clear any existing text and enter new value
-        patientCodeInput.clear();
-        patientCodeInput.sendKeys(patientCode); // Replace with actual Patient Code
+        fieldsElement.clear();
+        fieldsElement.sendKeys(searchValue); // Replace with actual Patient Code
 
-        patientCodeInput.sendKeys(Keys.ENTER);
+        fieldsElement.sendKeys(Keys.ENTER);
 
         try {
             Thread.sleep(3000);
@@ -294,6 +297,7 @@ public class BaseTest {
             throw new RuntimeException(e);
         }
     }
+
     public static void clearPatientSearchCode() {
         patientSearchLock.lock();
         try {
