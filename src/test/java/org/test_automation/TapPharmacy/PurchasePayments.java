@@ -11,11 +11,12 @@ public class PurchasePayments extends LoginAndLocationTest {
 
     @Test(priority = 3)
     public void menuClick() {
-        if (isLoginSuccessful)
+        if (isLoginSuccessful) {
             menuPanelClick("Purchase Payments", false, "", "");
+        }
     }
 
-    @Test(priority = 4)
+    @Test(priority = 4,dependsOnMethods = "menuClick")
     public void addPurchasePayments() {
 
         threadTimer(3000);
