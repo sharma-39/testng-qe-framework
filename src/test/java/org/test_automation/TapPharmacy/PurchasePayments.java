@@ -16,13 +16,13 @@ public class PurchasePayments extends LoginAndLocationTest {
         }
     }
 
-    @Test(priority = 4,dependsOnMethods = "menuClick")
+    @Test(priority = 4, dependsOnMethods = "menuClick")
     public void addPurchasePayments() {
 
         threadTimer(3000);
         filterSearchClick();
 
-        String supplierName="Supplier 67";
+        String supplierName = "Supplier 67";
         filterSearchElemenet(supplierName, "Supplier Name", "Text");
 
 
@@ -34,25 +34,34 @@ public class PurchasePayments extends LoginAndLocationTest {
 
         threadTimer(3000);
 
-        filterSearchClick();
-        threadTimer(2000);
-        filterSearchClick();
-        filterSearchElemenet("05-05-2024","pharmacyinvoiceDate","Date");
-
-        filterSearchElemenet("05-01-2025","pharmacygrnDate","Date");
-
-
-//        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
-//                By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
-//        )));
+//        filterSearchElemenet("05-05-2024","pharmacyinvoiceDate","Date");
 //
-//        row.findElement(By.xpath(".//button[@title='Payment']")).click();
+//        filterSearchElemenet("05-01-2025","pharmacygrnDate","Date");
 
+
+        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
+        )));
+
+        row.findElement(By.xpath(".//button[@title='Payment']")).click();
+
+
+        WebElement balanceInput = driver.findElement(By.xpath("//label[text()='Balance Amount']/following-sibling::input"));
+        String balanceValue = balanceInput.getAttribute("value");
+        System.out.println("Balance Amount: " + balanceValue);
+
+        WebElement amountInput = driver.findElement(
+                By.xpath("//label[contains(.,'Amount')]/following::app-input-number//input[@type='number']")
+        );
+
+// Clear and enter value
+        amountInput.clear();
+        amountInput.sendKeys(balanceValue); // Enter your desired amount (0-8862)
+
+        clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"));
 
 
     }
-
-
 
 
 }
