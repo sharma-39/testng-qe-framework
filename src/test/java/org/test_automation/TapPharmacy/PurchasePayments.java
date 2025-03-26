@@ -35,7 +35,7 @@ public class PurchasePayments extends LoginAndLocationTest {
         WebElement dateRangeDiv = driver.findElement(By.cssSelector("div#purchase-payments1"));
         dateRangeDiv.click();
 
-        filterDate("1 Month");
+        filterRangeSelect("1 Month");
 
         WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//td[span[contains(text(),'" + supplierName + "')]]/parent::tr")
@@ -46,15 +46,7 @@ public class PurchasePayments extends LoginAndLocationTest {
 
     }
 
-    private void filterDate(String range) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        By visiblePicker = By.cssSelector("div.daterangepicker.ltr.show-ranges.opensright[style*='display: block']");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(visiblePicker)); // Ensure the picker is visible
 
-        By oneMonthOption = By.cssSelector("div.daterangepicker.ltr.show-ranges.opensright[style*='display: block'] div.ranges li[data-range-key='" + range + "']");
-        WebElement oneMonthElement = wait.until(ExpectedConditions.elementToBeClickable(oneMonthOption));
 
-        oneMonthElement.click();
-    }
 }
