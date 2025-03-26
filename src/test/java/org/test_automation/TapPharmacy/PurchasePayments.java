@@ -39,7 +39,7 @@ public class PurchasePayments extends LoginAndLocationTest {
         filterSearchClick();
         filterSearchElemenet("05-05-2024","pharmacyinvoiceDate","Date");
 
-        filterSearchElemenet("01-05-2025","pharmacygrnDate","Date");
+        filterSearchElemenet("05-01-2025","pharmacygrnDate","Date");
 
 
 //        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(

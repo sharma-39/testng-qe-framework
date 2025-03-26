@@ -75,25 +75,34 @@ public class LoginAndLocationTest extends BaseTest {
                     loginButton.click();
 
 
-                    resultElement = wait.until(driver -> {
-                        List<By> locators = Arrays.asList(
-                                By.xpath("//span[text()='Welcome']"),
-                                By.xpath("//p[normalize-space(text())='Select Your Location']"),
-                                By.xpath("//p[contains(text(),'Your account has been temporarily locked')]"),
-                                By.xpath("//p[contains(text(),'Username or Password entered is incorrect')]"),
-                                By.xpath("//div[contains(@class, 'container-2')]/p[contains(text(),'Invalid Username')]")
-                        );
-
-                        for (By locator : locators) {
-                            List<WebElement> elements = driver.findElements(locator);
-                            if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
-                                //System.out.println("Elemenets"+elements.toString());
-                                return elements.get(0);
-                            }
+                    final Boolean[] isFound = {false};
+                    while (!isFound[0]) {
+                        try {
+                            resultElement = wait.until(driver -> {
+                                List<By> locators = Arrays.asList(
+                                        By.xpath("//span[text()='Welcome']"),
+                                        By.xpath("//p[normalize-space(text())='Select Your Location']"),
+                                        By.xpath("//p[contains(text(),'Your account has been temporarily locked')]"),
+                                        By.xpath("//p[contains(text(),'Username or Password entered is incorrect')]"),
+                                        By.xpath("//div[contains(@class, 'container-2')]/p[contains(text(),'Invalid Username')]")
+                                );
+                                isFound[0] = true;
+                                for (By locator : locators) {
+                                    List<WebElement> elements = driver.findElements(locator);
+                                    if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+                                        //System.out.println("Elemenets"+elements.toString());
+                                        return elements.get(0);
+                                    }
+                                }
+                                return null;
+                            });
+                        } catch (Exception e) {
+                            threadTimer(2000);
+                            JavascriptExecutor js = (JavascriptExecutor) driver;
+                            js.executeScript("location.reload()");
+                            isFound[0] = false;
                         }
-                        return null;
-                    });
-
+                    }
                     // System.out.println("==================result set "+resultElement+""+resultElement.getText().trim()+"================");
                     if (resultElement != null) {
                         String resultText = resultElement.getText().trim();
