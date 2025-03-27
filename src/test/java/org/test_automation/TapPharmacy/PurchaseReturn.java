@@ -244,7 +244,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
     }
 
 
-    private void enterQtyText(By xpath, String number, boolean b, WebDriverWait wait, WebDriver driver) {
+    private void enterQtyText(By xpath, String number, boolean editFlag, WebDriverWait wait, WebDriver driver) {
 
         WebElement qtyInput = driver.findElement(xpath);
         JavascriptExecutor js = (JavascriptExecutor) driver;
