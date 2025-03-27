@@ -54,6 +54,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
 
     @Test(priority = 4, dataProvider = "supplierData")
     public void addSupplierData(SupplierDTO supplierData) {
+        threadTimer(3000);
         System.out.println("Process Create Pharmacy Supplier flow---");
         String supplierName = returnHelper.addSupplier(this, supplierData, wait, driver);
         System.out.println("Supplier created with code: " + supplierName);
@@ -139,9 +140,9 @@ public class PurchaseReturn extends LoginAndLocationTest {
 
     @Test(priority = 5, dependsOnMethods = "menuClick")
     public void addPurchasePayments() {
-
-        menuPanelClick("Purchase Payments", false, "", "");
         threadTimer(3000);
+        menuPanelClick("Purchase Payments", false, "", "");
+
         filterSearchClick();
 
         String supplierName = purchaseSupplierName;
@@ -189,6 +190,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
 
     @Test(priority = 6)
     public void addPurchaseReturn() {
+        threadTimer(2000);
 
         System.out.println("Raw input data: " + tempStockData);
 
@@ -210,6 +212,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
 
     @Test(priority = 7)
     public void purchaseReturnPaid() {
+        threadTimer(3000);
         menuPanelClick("Returns", true, "Purchase Returns", "");
         threadTimer(3000);
         WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(

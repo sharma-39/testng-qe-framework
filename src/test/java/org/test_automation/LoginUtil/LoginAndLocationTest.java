@@ -19,31 +19,23 @@ public class LoginAndLocationTest extends BaseTest {
 
     @BeforeClass
     public void setUp() {
-        if (loginTextInPanel("Welcome")) {
+        if (checkWelcomeOrLoginFast(driver)) {
             isAlreadyLogin = true;
         } else {
             isLoginSuccessful = false;
         }
     }
 
-    private boolean loginTextInPanel(String expectedText) {
-        try {
-            // Wait for visibility of all matching elements
-            List<WebElement> elements = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
-                    By.xpath("//span[contains(text(),'Welcome') or contains(text(),'Login')]")
-            ));
+    public boolean checkWelcomeOrLoginFast(WebDriver driver) {
+        // Check for existing elements without waiting
+        List<WebElement> welcomes = driver.findElements(By.xpath("//span[contains(text(),'Welcome')]"));
+        List<WebElement> logins = driver.findElements(By.xpath("//span[contains(text(),'Login')]"));
 
-// Iterate through the list
-            for (WebElement element : elements) {
-                System.out.println("Texting found: " + element.getText());
-                if (element.getText().contains("Welcome")) {
-                    return true;
-                } else if (element.getText().contains("Login")) {
-                    return false;
-                }
-            }
-
-        } catch (Exception e) {
+        if (!welcomes.isEmpty()) {
+            System.out.println("Found Welcome text: " + welcomes.get(0).getText());
+            return true;
+        } else if (!logins.isEmpty()) {
+            System.out.println("Found Login text: " + logins.get(0).getText());
             return false;
         }
         return false;
