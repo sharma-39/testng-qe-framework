@@ -1,25 +1,32 @@
 package org.test_automation.OpBill;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
+import org.test_automation.VO.Charges;
+import org.test_automation.VO.OpBillData;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
 
 public class OpBillFlow extends LoginAndLocationTest {
 
+    private OpBillData testData;
     String insurenceProvider = null;
     String patientCode = null;
 
@@ -30,33 +37,26 @@ public class OpBillFlow extends LoginAndLocationTest {
     Integer chargeSize = 0;
     String chargesName;
 
-    private static final String[] FIRST_NAMES = {
-            "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Charles", "Thomas",
-            "Mary", "Jennifer", "Patricia", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen"
-    };
 
-    private static final String[] LAST_NAMES = {
-            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"
-    };
+    @DataProvider(name = "opBillData")
+    public Iterator<Object[]> getTestData() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        OpBillData data = mapper.readValue(
+                new File("src/test/resources/opFlowData.json"), OpBillData.class
+        );
+        return Collections.singletonList(new Object[]{data}).iterator();
+    }
 
-    private static final String[] DOCTOR_FIRST_NAMES = {
-            "Liam", "Noah", "Oliver", "Elijah", "James", "Benjamin", "Lucas", "Henry", "Alexander", "Mason",
-            "Emma", "Olivia", "Ava", "Sophia", "Isabella", "Charlotte", "Amelia", "Mia", "Harper", "Evelyn"
-    };
 
-    private static final String[] DOCTOR_LAST_NAMES = {
-            "Anderson", "Clark", "Wright", "Mitchell", "Carter", "Phillips", "Evans", "Turner", "Parker", "Collins"
-    };
-
-    @Test(priority = 3, description = "testLogin")
+    @Test(priority = 3, description = "testLogin", dataProvider = "opBillData")
     public void createInsurenceProvider() {
         if (insurenceProvider == null) {
             menuPanelClick("Master", true, "Insurance", "");
             clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"));
 
-            insurenceProvider = "Test insurence-"+generateSequence("INS");
+            insurenceProvider = testData.getInsuranceProvider().getNameBase() + generateSequence("INS");
             fillInputField("insuranceProvider", insurenceProvider);
-            fillInputField("insuranceProviderCode", "INSUR-"+generateSequence("TEST"));
+            fillInputField("insuranceProviderCode", testData.getInsuranceProvider().getCodeBase() + generateSequence("TEST"));
 
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
         }
@@ -72,25 +72,26 @@ public class OpBillFlow extends LoginAndLocationTest {
             //fill the patient code,FirstName, lastName,Dob,phonenumber,Gender,State,City mantatory fields,and insurence details
 
             patientCode = "PA-" + generateSequence("");
-            fillInputField("patientCode", patientCode);
-            String firstName = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)];
-            String lastName = LAST_NAMES[random.nextInt(LAST_NAMES.length)];
+            fillInputField("patientCode", testData.getPatient().getPatientCode());
+
+            String firstName = testData.getPatient().getFirstNames().get(random.nextInt(testData.getPatient().getFirstNames().size()));
+            String lastName = testData.getPatient().getLastNames().get(random.nextInt(testData.getPatient().getLastNames().size()));
             fillInputField("firstName", firstName);
             fillInputField("lastName", lastName);
-            fillInputField("phoneNumber", "9791310502");
-            selectRadioButton("gender", "Male", "");
+            fillInputField("phoneNumber", testData.getPatient().getPhoneNumber());
+            selectRadioButton("gender", testData.getPatient().getGender(), "");
 
-            selectDatePicker("05-05-1994", "patRegDob12");
+            selectDatePicker(testData.getPatient().getDob(), "patRegDob12");
             threadTimer(500);
 
 
-            selectFromMatSelectDropdown(driver, wait, "Select", "Chennai");
+            selectFromMatSelectDropdown(driver, wait, "Select", testData.getPatient().getCity());
 
-            selectRadioButton("insurance", "Yes", insurenceProvider);
+            selectRadioButton("insurance", testData.getPatient().getInsuranceEnable(), insurenceProvider);
             threadTimer(500);
             //expiryDate
-            selectDatePicker("05-05-2025", "patient-registration2");
-            fillInputField("insuranceCode", "INSURENCE");
+            selectDatePicker(testData.getPatient().getInsuranceExpiry(), "patient-registration2");
+            fillInputField("insuranceCode", testData.getPatient().getInsuranceCode());
 
             WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Submit')]")));
             System.out.println("Submit button found and clickable.");
@@ -102,7 +103,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             System.out.println("Verifying form submission success...");
 
             String messageText = handleRuntimeError("Patient", wait);
-            System.out.println("Message text:-- patient Code confirmation"+messageText);
+            System.out.println("Message text:-- patient Code confirmation" + messageText);
         }
     }
 
@@ -114,48 +115,34 @@ public class OpBillFlow extends LoginAndLocationTest {
             menuPanelClick("Staff", true, "Staff Registration", "");
             threadTimer(2000);
 
-
-            fillInputField("peopleCode", "DOC-" + generateSequence("IN"));
-            selectField("salutation", "Dr.");
+            fillInputField("peopleCode", testData.getStaff().getStaffCode());
+            selectField("salutation", testData.getStaff().getSalutation());
 
             Random random = new Random();
-            String firstName = FIRST_NAMES[random.nextInt(DOCTOR_FIRST_NAMES.length)];
-            String lastName = LAST_NAMES[random.nextInt(DOCTOR_LAST_NAMES.length)];
-
+            String firstName = testData.getStaff().getDoctorFirstNames().get(random.nextInt(testData.getStaff().getDoctorFirstNames().size()));
+            String lastName = testData.getStaff().getDoctorLastNames().get(random.nextInt(testData.getStaff().getDoctorLastNames().size()));
 
             fillInputField("firstName", firstName);
-
             fillInputField("lastName", lastName);
+            selectRadioButton("gender", testData.getStaff().getGender(), "");
 
-            selectRadioButton("gender", "Male", "");
+            selectDatePicker(testData.getStaff().getDob(), "staff-registration1");
+            fillInputField("phoneNumber", testData.getStaff().getPhoneNumber());
+            fillInputField("email", (firstName + lastName).toLowerCase() + testData.getStaff().getEmailSuffix());
+            selectFromMatSelectDropdown(driver, wait, "Select", testData.getPatient().getCity());
 
-
-            selectDatePicker("05-05-1990", "staff-registration1");
-
-            fillInputField("phoneNumber", "9377777323");
-            fillInputField("email", (firstName + lastName).toLowerCase() + "@gmail.com");
-            selectFromMatSelectDropdown(driver, wait, "Select", "Chennai");
-
-
-            fillInputField("designation", "Doctor");
-
-
+            fillInputField("designation", testData.getStaff().getDesignation());
             fillInputField("userName", (firstName + lastName).toLowerCase());
-            fillInputField("password", "Admin@123");
-
-
-            selectField("role", "Doctor");
-
+            fillInputField("password", testData.getStaff().getPassword());
+            selectField("role", testData.getStaff().getRole());
 
             WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Submit')]")));
-            System.out.println("Submit button found and clickable.");
-
-            // Click the submit button
             submitButton.click();
 
             doctorName = firstName + " " + lastName;
+            menuPanelClick("Dashboard", false, "", "");
 
-            menuPanelClick("Dashboard",false,"","");
+
         }
 
 
@@ -271,103 +258,72 @@ public class OpBillFlow extends LoginAndLocationTest {
         }
     }
 
+
     @Test(priority = 8, description = "added on charges")
     public void addCharges() {
-
         if (continueFlag) {
+            Charges chargesData = testData.getCharges();
 
+            // Create Header Type
             menuPanelClick("Master", true, "Charges", "");
             threadTimer(2000);
-
-
-            //create header type
             clickButtonElement(By.xpath("//a[@id='Header Type' and contains(@class, 'nav-link')]"));
-
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            headerType = "Charges " + generateSequence("HT");
-
+            headerType = chargesData.getHeaderTypeBase() + generateSequence("HT");
             fillInputField("headerTypeName", headerType);
-
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
-
-            //create header Group
-
-
+            // Create Header Group
             clickButtonElement(By.xpath("//a[@id='Header Group' and contains(@class, 'nav-link')]"));
-
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String headerGroup = "Charges group" + generateSequence("HG");
-
-
+            String headerGroup = chargesData.getHeaderGroupBase() + generateSequence("HG");
             fillInputField("headerGroupName", headerGroup);
-
             selectField("headerTypeId", headerType);
-
-
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
-
-            //created header
-
-
+            // Create Header
             clickButtonElement(By.xpath("//a[@id='Header' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String headerName = "Header" + generateSequence("HEAD");
+            String headerName = chargesData.getHeaderNameBase() + generateSequence("HEAD");
             fillInputField("headerName", headerName);
             selectField("headerGroupId", headerGroup);
-
             selectField("headerTypeId", headerType);
-
-
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
-
+            // Create UOM
             clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String uomCode = "UOM-TEST" + generateSequence("UOM-C");
-            String uomName = "UOM" + generateSequence("UOM-N-");
+            String uomCode = chargesData.getUomCodeBase() + generateSequence("UOM-C");
+            String uomName = chargesData.getUomNameBase() + generateSequence("UOM-N-");
             fillInputField("uomCode", uomCode);
-
             fillInputField("uomName", uomName);
-
-
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
-
-            // create Charges
+            // Create Charges
             clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
             fillMatOptionField("headerName", headerName);
+            selectField("itemType", chargesData.getItemType());
 
-            selectField("itemType", "OP");
-
-            chargesName = "Charge" + generateSequence("CR");
+            chargesName = chargesData.getItemNameBase() + generateSequence("CR");
             fillInputField("itemName", chargesName);
-
             selectField("uomId", uomName);
-
-            fillInputField("unitPrice", "100");
-
+            fillInputField("unitPrice", chargesData.getUnitPrice());
             selectRadioButton("usedStatus", "Active", "");
-
 
             WebElement checkbox = driver.findElement(
                     By.cssSelector("input[formcontrolname='excludeInsuranceClaim']")
             );
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", checkbox);
 
-
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
-
+            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')]"));
         }
     }
-
     @Test(priority = 9)
     public void createOpBill() {
         menuPanelClick("OP", false, "", "");
@@ -379,7 +335,7 @@ public class OpBillFlow extends LoginAndLocationTest {
         row.findElement(By.xpath(".//button[@title='View Bill']")).click();
 
 
-        List<String> optionTexts = List.of("ChargeCR-100374");
+        List<String> optionTexts = List.of(chargesName);
 
         // Click "Add New" to enable the dropdown if needed
         WebElement addNewButton = driver.findElement(By.xpath("//div[contains(@class, 'addIcon-button')]/span[text()='Add New']"));
