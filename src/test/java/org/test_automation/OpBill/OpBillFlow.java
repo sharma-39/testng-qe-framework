@@ -1,5 +1,6 @@
 package org.test_automation.OpBill;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
@@ -7,6 +8,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
+import org.test_automation.SupplierDTO;
 import org.test_automation.VO.Charges;
 import org.test_automation.VO.OpBillData;
 import org.testng.Assert;
@@ -18,6 +20,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -26,7 +29,7 @@ import java.util.List;
 
 public class OpBillFlow extends LoginAndLocationTest {
 
-    private OpBillData testData;
+    public OpBillData testData;
     String insurenceProvider = null;
     String patientCode = null;
 
@@ -39,16 +42,21 @@ public class OpBillFlow extends LoginAndLocationTest {
 
 
     @DataProvider(name = "opBillData")
-    public Iterator<Object[]> getTestData() throws IOException {
+    public Object[][] getTestData() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        OpBillData data = mapper.readValue(
-                new File("src/test/resources/opFlowData.json"), OpBillData.class
-        );
-        return Collections.singletonList(new Object[]{data}).iterator();
+        JsonNode rootNode = mapper.readTree(new File("src/test/resources/opFlowData.json"));
+        return new Object[][]{
+                {mapper.treeToValue(rootNode, OpBillData.class)} // Correct syntax
+        };
+    }
+
+    @Test(priority = 3, description = "testLogin", dataProvider = "opBillData")
+    public void setup(OpBillData testData) {
+        this.testData = testData; // Assign cached data to global variable
     }
 
 
-    @Test(priority = 3, description = "testLogin", dataProvider = "opBillData")
+    @Test(priority = 4, description = "testLogin")
     public void createInsurenceProvider() {
         if (insurenceProvider == null) {
             menuPanelClick("Master", true, "Insurance", "");
@@ -63,7 +71,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
     }
 
-    @Test(priority = 4, dependsOnMethods = "testLogin")
+    @Test(priority = 6, dependsOnMethods = "testLogin")
     public void patientRegisteration() {
         Random random = new Random();
         if (patientCode == null) {
@@ -71,8 +79,8 @@ public class OpBillFlow extends LoginAndLocationTest {
             threadTimer(3000);
             //fill the patient code,FirstName, lastName,Dob,phonenumber,Gender,State,City mantatory fields,and insurence details
 
-            patientCode = "PA-" + generateSequence("");
-            fillInputField("patientCode", testData.getPatient().getPatientCode());
+            patientCode = testData.getPatient().getPatientCode();
+            fillInputField("patientCode", patientCode);
 
             String firstName = testData.getPatient().getFirstNames().get(random.nextInt(testData.getPatient().getFirstNames().size()));
             String lastName = testData.getPatient().getLastNames().get(random.nextInt(testData.getPatient().getLastNames().size()));
@@ -107,7 +115,7 @@ public class OpBillFlow extends LoginAndLocationTest {
         }
     }
 
-    @Test(priority = 5)
+    @Test(priority = 7)
     public void createStaff() {
 
 
@@ -148,7 +156,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
     }
 
-    @Test(priority = 6)
+    @Test(priority = 8)
     public void createAppointment() {
         if (continueFlag) {
             menuPanelClick("Create Appointment", false, "", "");
@@ -240,7 +248,7 @@ public class OpBillFlow extends LoginAndLocationTest {
     }
 
 
-    @Test(priority = 7)
+    @Test(priority = 9)
     public void checkInAppointment() {
         if (continueFlag) {
             try {
@@ -259,7 +267,7 @@ public class OpBillFlow extends LoginAndLocationTest {
     }
 
 
-    @Test(priority = 8, description = "added on charges")
+    @Test(priority = 10, description = "added on charges")
     public void addCharges() {
         if (continueFlag) {
             Charges chargesData = testData.getCharges();
@@ -324,7 +332,8 @@ public class OpBillFlow extends LoginAndLocationTest {
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')]"));
         }
     }
-    @Test(priority = 9)
+
+    @Test(priority = 11)
     public void createOpBill() {
         menuPanelClick("OP", false, "", "");
 

@@ -1,0 +1,41 @@
+{
+  "insuranceProvider": {
+    "nameBase": "Test Insurance-",
+    "codeBase": "INSUR-"
+  },
+  "patient": {
+    "patientCode": "SHARMA-01",
+    "firstNames": ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Charles", "Thomas", "Mary", "Jennifer", "Patricia", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen"],
+    "lastNames": ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"],
+    "phoneNumber": "9791310502",
+    "gender": "Male",
+    "dob": "05-05-1994",
+    "city": "Chennai",
+    "insuranceEnable":"Yes",
+    "insuranceExpiry": "05-05-2025",
+    "insuranceCode": "INSURANCE"
+  },
+  "staff": {
+    "staffCode": "STAFF-01",
+    "doctorFirstNames": ["Liam", "Noah", "Oliver", "Elijah", "James", "Benjamin", "Lucas", "Henry", "Alexander", "Mason", "Emma", "Olivia", "Ava", "Sophia", "Isabella", "Charlotte", "Amelia", "Mia", "Harper", "Evelyn"],
+    "doctorLastNames": ["Anderson", "Clark", "Wright", "Mitchell", "Carter", "Phillips", "Evans", "Turner", "Parker", "Collins"],
+    "salutation": "Dr.",
+    "gender": "Male",
+    "dob": "05-05-1990",
+    "phoneNumber": "9377777323",
+    "emailSuffix": "@gmail.com",
+    "designation": "Doctor",
+    "password": "Admin@123",
+    "role": "Doctor"
+  },
+  "charges": {
+    "headerTypeBase": "Charges HT",
+    "headerGroupBase": "Charges group HG",
+    "headerNameBase": "Header HEAD",
+    "uomCodeBase": "UOM-TEST",
+    "uomNameBase": "UOM",
+    "itemType": "OP",
+    "itemNameBase": "Charge CR",
+    "unitPrice": "100"
+  }
+}
