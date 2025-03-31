@@ -239,14 +239,19 @@ public class BaseTest {
     }
 
     public void clickButtonElement(By locator) {
+        System.out.println("locater" + locator);
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-            if (element.isEnabled()) {
+            try {
+                if (element.isEnabled()) {
+                    element.click();
+                }
+            } catch (Exception e) {
                 element.click();
             }
         } catch (Exception e) {
-            System.out.println("Normal click failed, using JavaScript click...");
+            System.out.println("Normal click failed, using JavaScript click..." + e);
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", driver.findElement(locator));
         }
@@ -332,6 +337,7 @@ public class BaseTest {
 
         oneMonthElement.click();
     }
+
     public void selectDatePicker(String dateValue) {
         System.out.println("date value: " + dateValue);
         String[] dateFormat = dateValue.split("-");
@@ -364,7 +370,7 @@ public class BaseTest {
         // Select Day
         List<WebElement> days = driver.findElements(By.cssSelector("div.daterangepicker[style*='display: block'] td.available"));
         for (WebElement day : days) {
-            System.out.println("get Days"+day.getText());
+            System.out.println("get Days" + day.getText());
             if (day.getText().trim().equals(dateText)) { // Fixing Integer.parseInt issue
                 day.click();
                 System.out.println("Selected Day: " + dateText);
