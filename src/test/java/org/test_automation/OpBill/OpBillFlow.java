@@ -8,11 +8,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
-import org.test_automation.SupplierDTO;
 import org.test_automation.VO.Charges;
 import org.test_automation.VO.OpBillData;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -20,7 +18,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -62,9 +59,9 @@ public class OpBillFlow extends LoginAndLocationTest {
             menuPanelClick("Master", true, "Insurance", "");
             clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"));
 
-            insurenceProvider = testData.getInsuranceProvider().getNameBase() + generateSequence("INS");
+            insurenceProvider = testData.getInsuranceProvider().getNameBase() + generateSequence();
             fillInputField("insuranceProvider", insurenceProvider);
-            fillInputField("insuranceProviderCode", testData.getInsuranceProvider().getCodeBase() + generateSequence("TEST"));
+            fillInputField("insuranceProviderCode", testData.getInsuranceProvider().getCodeBase() + generateSequence());
 
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
         }
@@ -278,7 +275,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             clickButtonElement(By.xpath("//a[@id='Header Type' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            headerType = chargesData.getHeaderTypeBase() + generateSequence("HT");
+            headerType = chargesData.getHeaderTypeBase() + generateSequence();
             fillInputField("headerTypeName", headerType);
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
@@ -286,7 +283,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             clickButtonElement(By.xpath("//a[@id='Header Group' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String headerGroup = chargesData.getHeaderGroupBase() + generateSequence("HG");
+            String headerGroup = chargesData.getHeaderGroupBase() + generateSequence();
             fillInputField("headerGroupName", headerGroup);
             selectField("headerTypeId", headerType);
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
@@ -295,7 +292,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             clickButtonElement(By.xpath("//a[@id='Header' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String headerName = chargesData.getHeaderNameBase() + generateSequence("HEAD");
+            String headerName = chargesData.getHeaderNameBase() + generateSequence();
             fillInputField("headerName", headerName);
             selectField("headerGroupId", headerGroup);
             selectField("headerTypeId", headerType);
@@ -305,8 +302,8 @@ public class OpBillFlow extends LoginAndLocationTest {
             clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
             clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-            String uomCode = chargesData.getUomCodeBase() + generateSequence("UOM-C");
-            String uomName = chargesData.getUomNameBase() + generateSequence("UOM-N-");
+            String uomCode = chargesData.getUomCodeBase() + generateSequence();
+            String uomName = chargesData.getUomNameBase() + generateSequence();
             fillInputField("uomCode", uomCode);
             fillInputField("uomName", uomName);
             clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
@@ -318,7 +315,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             fillMatOptionField("headerName", headerName);
             selectField("itemType", chargesData.getItemType());
 
-            chargesName = chargesData.getItemNameBase() + generateSequence("CR");
+            chargesName = chargesData.getItemNameBase() + generateSequence();
             fillInputField("itemName", chargesName);
             selectField("uomId", uomName);
             fillInputField("unitPrice", chargesData.getUnitPrice());
@@ -625,8 +622,8 @@ public class OpBillFlow extends LoginAndLocationTest {
         }
     }
 
-    String generateSequence(String code) {
-        String randomPart = code + "-" + new Random().nextInt(900);
+    String generateSequence() {
+        String randomPart = ""+ new Random().nextInt(9999);
         return randomPart;
     }
 
