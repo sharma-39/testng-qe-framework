@@ -20,12 +20,25 @@ import java.util.Random;
 
 public class LabFlow extends LoginAndLocationTest {
 
+    String labGroupName;
+    String specimenName;
+    String uomName;
 
+    String labTestName;
 
-    @Test(priority = 4,description = "Lab Master",dependsOnMethods = "testLogin")
-    public void labMasterCreate()
-    {
+    @Test(priority = 4, description = "Lab Master", dependsOnMethods = "testLogin")
+    public void labMasterCreate() {
         menuPanelClick("Master", true, "Lab", "");
+
+        labGroupName = "Lab Group" + generateSequence();
+
+        specimenName = "Spec" + generateSequence();
+
+        String uomCode = "UOM-C" + generateSequence();
+        uomName = "UOM-N" + generateSequence();
+
+        labTestName = "Lab Test" + generateSequence();
+
         threadTimer(2000);
         clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"));
         clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
@@ -33,12 +46,11 @@ public class LabFlow extends LoginAndLocationTest {
 
         //create TestGroup
         //fill the labGroupName
-        String labGroupName = "Lab Group" + generateSequence();
+
         fillInputField("labGroupName", labGroupName);
         threadTimer(1000);
 
-
-        clickButtonElement(By.xpath("//button[contains(text(),'Save')]"));
+        multipleElementSaveAndClose("labGroupForm");
 
         threadTimer(2000);
         //create Specimen Details
@@ -46,12 +58,22 @@ public class LabFlow extends LoginAndLocationTest {
 
         clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-        String specimenName = "Spec"+generateSequence();
-        fillInputField("name",specimenName);
-        threadTimer(500);
 
-        clickButtonElement(By.xpath("(//button[contains(text(),'Save')])"));
+        threadTimer(1000);
+        // Locate the specimenForm by its ID
+        WebElement specimenForm = driver.findElement(By.xpath("//form[@id='specimenGroupForm']"));
 
+// Locate all input elements inside the specimenForm
+        List<WebElement> inputFields = specimenForm.findElements(By.xpath(".//input"));
+
+// Iterate over the list of input fields and perform actions
+
+        for (WebElement inputField : inputFields) {
+            inputField.click();
+            inputField.sendKeys(specimenName);
+        }
+
+        multipleElementSaveAndClose("specimenGroupForm");
 
         threadTimer(2000);
 
@@ -59,35 +81,231 @@ public class LabFlow extends LoginAndLocationTest {
         clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
         clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-        String uomCode = "UOM-C-" + generateSequence();
-        String uomName = "UOM-N-" + generateSequence();
+
         fillInputField("uomCode", uomCode);
         fillInputField("uomName", uomName);
-        clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
 
+        multipleElementSaveAndClose("chargesForm");
+
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("location.reload()");
+        threadTimer(2000);
+        //lab text nav form
 
         clickButtonElement(By.xpath("//a[@id='Lab Test' and contains(@class, 'nav-link')]"));
 
 
+        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
 
+        fillInputField("labTestName", labTestName);
+        selectField("labGroupId", labGroupName);
+        selectField("labTypeId", "Basic");
+
+        selectRadioButton("formulary", "Yes", "");
+        selectRadioButton("nrtForTheDay", "Yes", "");
+        selectRadioButton("nrtForTheStay", "Yes", "");
+        fillInputField("routineDuration", "10");
+        fillInputField("statDuration", "50");
+
+        selectRadioButton("cultureTest", "Yes", "");
+
+        //   fillInputField("price","1000");
+        selectRadioButton("confidentialReport", "Yes", "");
+
+        selectRadioButton("active", "Active", "");
+
+        fillTextareaField("testDescription", "description value");
+
+        String packageOnly = "Yes";
+        selectRadioButton("packageOnly", packageOnly, "");
 
 
+        if (packageOnly.contains("Yes")) {
+        } else {
+            //performance type : =Inhouse and Outsource
+            String performanceType = "Inhouse";
+            selectRadioButton("performanceType", performanceType, "");
+
+            if (performanceType.equals("Outsource")) {
+                //type :Billable  and Report only
+                selectRadioButton("serviceType", "Billable", "");
+
+            }
+        }
+
+        selectWithOutFormNameUsingTitle("Specimen Type", specimenName);
+        selectWithOutFormNameUsingTitle("UOM", uomName);
+
+        multipleElementSaveAndClose("labTestForm");
+
+        if (packageOnly.equals("Yes")) {
+
+            WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
+            )));
+
+            row.findElement(By.xpath(".//button[@title='Add Result']")).click();
+
+            threadTimer(2000);
+            selectField("sex", "Male");
+            fillTheTextFieldInTitle("Age (From)", "5");
+            selectField("ageFromUnit", "Years");
+
+            fillTheTextFieldInTitle("Age (To)", "10");
+            selectField("ageToUnit", "Years");
+
+            selectRadioButton("resultHelpValue", "Yes", "");
+
+            String labResultTypeId = "Drop-Down";
+
+            selectField("labResultTypeId", labResultTypeId);
+
+            if (labResultTypeId.equals("Range")) {
+                System.out.println("selected " + labResultTypeId);
+                fillInputField("low", "50");
+                fillInputField("high", "100");
+                selectField("uomId", uomName);
+                fillInputField("criticallyLow", "10");
+                fillInputField("criticallyHigh", "110");
+                fillInputField("defaultValue", "10");
+                //fillTextareaField("Description","test description");
+
+            } else if (labResultTypeId.equals("Multi-Range")) {
+                System.out.println("selected " + labResultTypeId);
+
+                Boolean abnormalEnable = true;
+                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
+                ));
 
 
+                if (abnormalEnable) {
+                    if (!abnormalCheckbox.isSelected()) {
+                        abnormalCheckbox.click();
+                    }
+                }
+                selectWithOutFormNameUsingTitle("Range", "<=");
+                fillTheTextFieldInTitle("Value", "50");
+
+                fillTheTextFieldInTitle("Description", "Test desc");
+
+                //selectWithOutFormNameUsingTitle("UOM", uomName);
+
+                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName);
+            } else if (labResultTypeId.equals("Descriptive")) {
+
+                System.out.println("selected " + labResultTypeId);
+
+                fillTextareaField("valueStr", "test desc");
+
+                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[3]/app-select/div/select", uomName);
+            } else if (labResultTypeId.equals("Drop-Down")) {
+                System.out.println("selected " + labResultTypeId);
+                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
+                ));
+                Boolean abnormalEnable = true;
+                if (abnormalEnable) {
+                    if (!abnormalCheckbox.isSelected()) {
+                        abnormalCheckbox.click();
+                    }
+                }
+                fillTheTextFieldInTitle("Options", "Test");
+
+                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName);
+            }
 
 
+            multipleElementSaveAndClose("procedureForm");
+        }
+    }
+
+    private void selectFieldUsingXPath(String xpath, String uomName) {
 
 
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath(xpath)
+        ));
+
+        Select select = new Select(dropdown);
+
+        select.selectByVisibleText(uomName);
     }
 
 
+    private void fillTheTextFieldInTitle(String title, String value) {
+        String cssSelector = "app-input-text[title='" + title + "'] input, input[title='" + title + "']";
+
+        WebElement ageInput = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(cssSelector)
+        ));
+
+        // Clear existing value using JavaScript (works better with Angular forms)
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = '';", ageInput
+        );
+
+        ageInput.sendKeys(value);
 
 
+        threadTimer(500);
+    }
 
+    private void multipleElementSaveAndClose(String id) {
+        By saveCloseLocator = By.xpath("//form[@id='" + id + "']//button[contains(@class, 'saveNdClose') and normalize-space(.)='Save & Close']");
 
+        clickButtonElement(saveCloseLocator);
 
+        threadTimer(2000);
+    }
 
+    private void selectWithOutFormNameUsingTitle(String title, String value) {
+
+        threadTimer(500);
+        // Locate the Angular <app-select> component and its nested <select>
+        String cssSelector = "app-select[title='" + title + "'] select";
+
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(cssSelector)
+        ));
+
+        // Use Selenium's Select class for dropdown manipulation
+        Select select = new Select(dropdown);
+
+        List<WebElement> options = select.getOptions();
+
+        System.out.println("Dropdown Options:");
+        for (WebElement option : options) {
+            System.out.println("Value: " + option.getAttribute("value") + " | Text: " + option.getText());
+        }
+        // Select by visible text (alternatively use value "973")
+        select.selectByVisibleText(value);
+
+        // Verify selection\
+        threadTimer(500);  // Your existing delay
+    }
+
+    private void fillTextareaField(String formControlName, String value) {
+        // Use CSS selector to target the Angular component structure
+        String cssSelector = String.format("app-textarea[formcontrolname='%s'] textarea", formControlName);
+
+        // Wait for the textarea to be interactable
+        WebElement textarea = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(cssSelector)));
+
+        // Clear existing text using JavaScript (more reliable for Angular fields)
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = '';", textarea
+        );
+
+        // Send keys and validate input
+        textarea.sendKeys(value);
+
+        // Verify the value was entered
+
+        threadTimer(500);  // Your existing delay
+    }
 
     //common functionality working
 
@@ -125,6 +343,7 @@ public class LabFlow extends LoginAndLocationTest {
 // 4. Click the matching option
         desiredOption.click();
     }
+
 
     private void selectField(String title, String value) {
         WebElement titleDropdown;
@@ -266,17 +485,18 @@ public class LabFlow extends LoginAndLocationTest {
     private void fillInputField(String fieldPathId, String value) {
 
         WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//input[@formcontrolname='" + fieldPathId + "'] | //app-input-text[@formcontrolname='" + fieldPathId + "']//input | //textarea[@formcontrolname='" + fieldPathId + "']")
+                By.xpath("//input[@formcontrolname='" + fieldPathId + "'] | //app-input-text[@formcontrolname='" + fieldPathId + "']//input | //textarea[@formcontrolname='" + fieldPathId + "'] | app-textarea[@formcontrolname='" + fieldPathId + "']//textarea")
         ));
-
-        inputField.clear();
-        inputField.sendKeys(value);
-        inputField.sendKeys(Keys.TAB);
-        threadTimer(500);
+        if (inputField.isEnabled()) {
+            inputField.clear();
+            inputField.sendKeys(value);
+            inputField.sendKeys(Keys.TAB);
+            threadTimer(500);
+        }
     }
 
 
-    private void selectRadioButton(String formControlName, String value, String insurenceProvider) {
+    private void selectRadioButton(String formControlName, String value, String childValue) {
         try {
             WebElement radioButton = wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//input[@formcontrolname='" + formControlName + "'][@value='" + value + "'] | //label[span[contains(text(), '" + value + "')]]/input[@formcontrolname='" + formControlName + "'] ")
@@ -284,9 +504,6 @@ public class LabFlow extends LoginAndLocationTest {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", radioButton);
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", radioButton);
             System.out.println("Selected radio button: " + value);
-            if (value.equals("Yes")) {
-                selectDropDown(insurenceProvider, "insuranceProviderId");
-            }
         } catch (TimeoutException e) {
             System.out.println("Radio button with value '" + value + "' not found!");
         }
@@ -322,7 +539,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     String generateSequence() {
-        String randomPart = ""+ new Random().nextInt(9999);
+        String randomPart = "-" + new Random().nextInt(9999);
         return randomPart;
     }
 
