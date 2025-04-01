@@ -20,229 +20,248 @@ import java.util.Random;
 
 public class LabFlow extends LoginAndLocationTest {
 
+    Boolean chargestap = false;
     String labGroupName;
     String specimenName;
     String uomName;
 
     String labTestName;
+//
+//    @Test(priority = 4, description = "Lab Master", dependsOnMethods = "testLogin")
+//    public void labMasterCreate() {
+//        menuPanelClick("Master", true, "Lab", "");
+//
+//        labGroupName = "Lab Group" + generateSequence();
+//
+//        specimenName = "Spec" + generateSequence();
+//
+//        String uomCode = "UOM-C" + generateSequence();
+//        uomName = "UOM-N" + generateSequence();
+//
+//        labTestName = "Lab Test" + generateSequence();
+//
+//        threadTimer(2000);
+//        clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"));
+//        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+//
+//
+//        //create TestGroup
+//        //fill the labGroupName
+//
+//        fillInputField("labGroupName", labGroupName);
+//        threadTimer(1000);
+//
+//        multipleElementSaveAndClose("labGroupForm");
+//
+//        threadTimer(2000);
+//        //create Specimen Details
+//        clickButtonElement(By.xpath("//a[@id='Specimen Details' and contains(@class, 'nav-link')]"));
+//
+//        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+//
+//
+//        threadTimer(1000);
+//        // Locate the specimenForm by its ID
+//        WebElement specimenForm = driver.findElement(By.xpath("//form[@id='specimenGroupForm']"));
+//
+//// Locate all input elements inside the specimenForm
+//        List<WebElement> inputFields = specimenForm.findElements(By.xpath(".//input"));
+//
+//// Iterate over the list of input fields and perform actions
+//
+//        for (WebElement inputField : inputFields) {
+//            inputField.click();
+//            inputField.sendKeys(specimenName);
+//        }
+//
+//        multipleElementSaveAndClose("specimenGroupForm");
+//
+//        threadTimer(2000);
+//
+//
+//        clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
+//        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+//
+//
+//        fillInputField("uomCode", uomCode);
+//        fillInputField("uomName", uomName);
+//
+//        multipleElementSaveAndClose("chargesForm");
+//
+//
+//        JavascriptExecutor js = (JavascriptExecutor) driver;
+//        js.executeScript("location.reload()");
+//        threadTimer(2000);
+//        //lab text nav form
+//
+//        clickButtonElement(By.xpath("//a[@id='Lab Test' and contains(@class, 'nav-link')]"));
+//
+//
+//        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+//
+//
+//        fillInputField("labTestName", labTestName);
+//        selectField("labGroupId", labGroupName);
+//        selectField("labTypeId", "Basic");
+//
+//        selectRadioButton("formulary", "Yes", "");
+//        selectRadioButton("nrtForTheDay", "Yes", "");
+//        selectRadioButton("nrtForTheStay", "Yes", "");
+//        fillInputField("routineDuration", "10");
+//        fillInputField("statDuration", "50");
+//
+//        selectRadioButton("cultureTest", "Yes", "");
+//
+//        //   fillInputField("price","1000");
+//        selectRadioButton("confidentialReport", "Yes", "");
+//
+//        selectRadioButton("active", "Active", "");
+//
+//        fillTextareaField("testDescription", "description value");
+//
+//        String packageOnly = "No";
+//        selectRadioButton("packageOnly", packageOnly, "");
+//
+//        String performanceType = "Outsource";
+//
+//        if (packageOnly.contains("Yes")) {
+//        } else {
+//            //performance type : =Inhouse and Outsource
+//            selectRadioButton("performanceType", performanceType, "");
+//
+//            if (performanceType.equals("Outsource")) {
+//                //type :Billable  and Report only
+//                selectRadioButton("serviceType", "Billable", "");
+//
+//            }
+//        }
+//
+//        selectWithOutFormNameUsingTitle("Specimen Type", specimenName);
+//        selectWithOutFormNameUsingTitle("UOM", uomName);
+//
+//        multipleElementSaveAndClose("labTestForm");
+//
+//        if (packageOnly.equals("Yes")) {
+//
+//            WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+//                    By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
+//            )));
+//
+//            row.findElement(By.xpath(".//button[@title='Add Result']")).click();
+//
+//            threadTimer(2000);
+//            selectField("sex", "Male");
+//            fillTheTextFieldInTitle("Age (From)", "5");
+//            selectField("ageFromUnit", "Years");
+//
+//            fillTheTextFieldInTitle("Age (To)", "10");
+//            selectField("ageToUnit", "Years");
+//
+//            selectRadioButton("resultHelpValue", "Yes", "");
+//
+//            String labResultTypeId = "Drop-Down";
+//
+//            selectField("labResultTypeId", labResultTypeId);
+//
+//            if (labResultTypeId.equals("Range")) {
+//                System.out.println("selected " + labResultTypeId);
+//                fillInputField("low", "50");
+//                fillInputField("high", "100");
+//                selectField("uomId", uomName);
+//                fillInputField("criticallyLow", "10");
+//                fillInputField("criticallyHigh", "110");
+//                fillInputField("defaultValue", "10");
+//                //fillTextareaField("Description","test description");
+//
+//            } else if (labResultTypeId.equals("Multi-Range")) {
+//                System.out.println("selected " + labResultTypeId);
+//
+//                Boolean abnormalEnable = true;
+//                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
+//                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
+//                ));
+//
+//
+//                if (abnormalEnable) {
+//                    if (!abnormalCheckbox.isSelected()) {
+//                        abnormalCheckbox.click();
+//                    }
+//                }
+//                selectWithOutFormNameUsingTitle("Range", "<=");
+//                fillTheTextFieldInTitle("Value", "50");
+//
+//                fillTheTextFieldInTitle("Description", "Test desc");
+//
+//                //selectWithOutFormNameUsingTitle("UOM", uomName);
+//
+//                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName);
+//            } else if (labResultTypeId.equals("Descriptive")) {
+//
+//                System.out.println("selected " + labResultTypeId);
+//
+//                fillTextareaField("valueStr", "test desc");
+//
+//                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[3]/app-select/div/select", uomName);
+//            } else if (labResultTypeId.equals("Drop-Down")) {
+//                System.out.println("selected " + labResultTypeId);
+//                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
+//                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
+//                ));
+//                Boolean abnormalEnable = true;
+//                if (abnormalEnable) {
+//                    if (!abnormalCheckbox.isSelected()) {
+//                        abnormalCheckbox.click();
+//                    }
+//                }
+//                fillTheTextFieldInTitle("Options", "Test");
+//
+//                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName);
+//            }
+//
+//
+//            multipleElementSaveAndClose("procedureForm");
+//
+//            threadTimer(2000);
+//
+//        }
+//        System.out.println("complete lab Test flow PO " + packageOnly + "| PT:" + performanceType);
+//        System.out.println("charges added to lab name" + labTestName);
+//        if (packageOnly.equals("No")) {
+//            if (performanceType.equals("Outsource")) {
+//                chargestap = true;
+//            }
+//        }
+//    }
+//
 
-    @Test(priority = 4, description = "Lab Master", dependsOnMethods = "testLogin")
-    public void labMasterCreate() {
-        menuPanelClick("Master", true, "Lab", "");
+    @Test(priority = 4)
+    public void switchChargeTap() {
 
-        labGroupName = "Lab Group" + generateSequence();
+        chargestap=true;
 
-        specimenName = "Spec" + generateSequence();
+        labTestName="Lab Test-1980";
+        if (chargestap) {
 
-        String uomCode = "UOM-C" + generateSequence();
-        uomName = "UOM-N" + generateSequence();
+            menuPanelClick("Master", true, "Charges", "");
+            threadTimer(2000);
 
-        labTestName = "Lab Test" + generateSequence();
-
-        threadTimer(2000);
-        clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
-
-
-        //create TestGroup
-        //fill the labGroupName
-
-        fillInputField("labGroupName", labGroupName);
-        threadTimer(1000);
-
-        multipleElementSaveAndClose("labGroupForm");
-
-        threadTimer(2000);
-        //create Specimen Details
-        clickButtonElement(By.xpath("//a[@id='Specimen Details' and contains(@class, 'nav-link')]"));
-
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
-
-
-        threadTimer(1000);
-        // Locate the specimenForm by its ID
-        WebElement specimenForm = driver.findElement(By.xpath("//form[@id='specimenGroupForm']"));
-
-// Locate all input elements inside the specimenForm
-        List<WebElement> inputFields = specimenForm.findElements(By.xpath(".//input"));
-
-// Iterate over the list of input fields and perform actions
-
-        for (WebElement inputField : inputFields) {
-            inputField.click();
-            inputField.sendKeys(specimenName);
-        }
-
-        multipleElementSaveAndClose("specimenGroupForm");
-
-        threadTimer(2000);
-
-
-        clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
-
-
-        fillInputField("uomCode", uomCode);
-        fillInputField("uomName", uomName);
-
-        multipleElementSaveAndClose("chargesForm");
-
-
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("location.reload()");
-        threadTimer(2000);
-        //lab text nav form
-
-        clickButtonElement(By.xpath("//a[@id='Lab Test' and contains(@class, 'nav-link')]"));
-
-
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
-
-
-        fillInputField("labTestName", labTestName);
-        selectField("labGroupId", labGroupName);
-        selectField("labTypeId", "Basic");
-
-        selectRadioButton("formulary", "Yes", "");
-        selectRadioButton("nrtForTheDay", "Yes", "");
-        selectRadioButton("nrtForTheStay", "Yes", "");
-        fillInputField("routineDuration", "10");
-        fillInputField("statDuration", "50");
-
-        selectRadioButton("cultureTest", "Yes", "");
-
-        //   fillInputField("price","1000");
-        selectRadioButton("confidentialReport", "Yes", "");
-
-        selectRadioButton("active", "Active", "");
-
-        fillTextareaField("testDescription", "description value");
-
-        String packageOnly = "No";
-        selectRadioButton("packageOnly", packageOnly, "");
-
-        String performanceType = "Outsource";
-
-        if (packageOnly.contains("Yes")) {
-        } else {
-            //performance type : =Inhouse and Outsource
-            selectRadioButton("performanceType", performanceType, "");
-
-            if (performanceType.equals("Outsource")) {
-                //type :Billable  and Report only
-                selectRadioButton("serviceType", "Billable", "");
-
-            }
-        }
-
-        selectWithOutFormNameUsingTitle("Specimen Type", specimenName);
-        selectWithOutFormNameUsingTitle("UOM", uomName);
-
-        multipleElementSaveAndClose("labTestForm");
-
-        if (packageOnly.equals("Yes")) {
+            clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
 
             WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
             )));
 
-            row.findElement(By.xpath(".//button[@title='Add Result']")).click();
+            row.findElement(By.xpath(".//button[@title='Edit']")).click();
 
+            String headerName = "HeaderHEAD-100155";
+            fillMatOptionField("headerName", headerName);
+
+
+            selectField("uomId", "TEST-UOM");
+            fillInputField("unitPrice", "1000");
             threadTimer(2000);
-            selectField("sex", "Male");
-            fillTheTextFieldInTitle("Age (From)", "5");
-            selectField("ageFromUnit", "Years");
-
-            fillTheTextFieldInTitle("Age (To)", "10");
-            selectField("ageToUnit", "Years");
-
-            selectRadioButton("resultHelpValue", "Yes", "");
-
-            String labResultTypeId = "Drop-Down";
-
-            selectField("labResultTypeId", labResultTypeId);
-
-            if (labResultTypeId.equals("Range")) {
-                System.out.println("selected " + labResultTypeId);
-                fillInputField("low", "50");
-                fillInputField("high", "100");
-                selectField("uomId", uomName);
-                fillInputField("criticallyLow", "10");
-                fillInputField("criticallyHigh", "110");
-                fillInputField("defaultValue", "10");
-                //fillTextareaField("Description","test description");
-
-            } else if (labResultTypeId.equals("Multi-Range")) {
-                System.out.println("selected " + labResultTypeId);
-
-                Boolean abnormalEnable = true;
-                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
-                ));
-
-
-                if (abnormalEnable) {
-                    if (!abnormalCheckbox.isSelected()) {
-                        abnormalCheckbox.click();
-                    }
-                }
-                selectWithOutFormNameUsingTitle("Range", "<=");
-                fillTheTextFieldInTitle("Value", "50");
-
-                fillTheTextFieldInTitle("Description", "Test desc");
-
-                //selectWithOutFormNameUsingTitle("UOM", uomName);
-
-                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName);
-            } else if (labResultTypeId.equals("Descriptive")) {
-
-                System.out.println("selected " + labResultTypeId);
-
-                fillTextareaField("valueStr", "test desc");
-
-                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[3]/app-select/div/select", uomName);
-            } else if (labResultTypeId.equals("Drop-Down")) {
-                System.out.println("selected " + labResultTypeId);
-                WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
-                ));
-                Boolean abnormalEnable = true;
-                if (abnormalEnable) {
-                    if (!abnormalCheckbox.isSelected()) {
-                        abnormalCheckbox.click();
-                    }
-                }
-                fillTheTextFieldInTitle("Options", "Test");
-
-                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName);
-            }
-
-
-            multipleElementSaveAndClose("procedureForm");
-
-            threadTimer(2000);
-
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
         }
-        System.out.println("complete lab Test flow PO " + packageOnly + "| PT:" + performanceType);
-        System.out.println("charges added to lab name" + labTestName);
-        if (packageOnly.equals("No")) {
-            if (performanceType.equals("Outsource")) {
-                switchChargeTap(labTestName);
-            }
-        }
-    }
-
-    private void switchChargeTap(String labTestName) {
-
-
-        menuPanelClick("Master", true, "Charges", "");
-        clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
-
-        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
-        )));
-
-        row.findElement(By.xpath(".//button[@title='Edit']")).click();
 
     }
 

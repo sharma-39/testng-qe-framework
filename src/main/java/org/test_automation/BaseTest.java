@@ -243,13 +243,11 @@ public class BaseTest {
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-            try {
-                if (element.isEnabled()) {
-                    element.click();
-                }
-            } catch (Exception e) {
+
+            if (element.isEnabled()) {
                 element.click();
             }
+
         } catch (Exception e) {
             System.out.println("Normal click failed, using JavaScript click..." + e);
             JavascriptExecutor js = (JavascriptExecutor) driver;

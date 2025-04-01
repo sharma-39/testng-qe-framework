@@ -63,7 +63,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             fillInputField("insuranceProvider", insurenceProvider);
             fillInputField("insuranceProviderCode", testData.getInsuranceProvider().getCodeBase() + generateSequence());
 
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
         }
 
     }
@@ -238,7 +238,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
                 selectDropDown(doctorName, "doctorId");
 
-                clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+                clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
             }
         }
 
@@ -277,7 +277,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
             headerType = chargesData.getHeaderTypeBase() + generateSequence();
             fillInputField("headerTypeName", headerType);
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
 
             // Create Header Group
             clickButtonElement(By.xpath("//a[@id='Header Group' and contains(@class, 'nav-link')]"));
@@ -286,7 +286,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             String headerGroup = chargesData.getHeaderGroupBase() + generateSequence();
             fillInputField("headerGroupName", headerGroup);
             selectField("headerTypeId", headerType);
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
 
             // Create Header
             clickButtonElement(By.xpath("//a[@id='Header' and contains(@class, 'nav-link')]"));
@@ -296,7 +296,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             fillInputField("headerName", headerName);
             selectField("headerGroupId", headerGroup);
             selectField("headerTypeId", headerType);
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
 
             // Create UOM
             clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
@@ -306,7 +306,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             String uomName = chargesData.getUomNameBase() + generateSequence();
             fillInputField("uomCode", uomCode);
             fillInputField("uomName", uomName);
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
 
             // Create Charges
             clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
@@ -326,7 +326,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             );
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", checkbox);
 
-            clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')]"));
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
         }
     }
 
