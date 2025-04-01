@@ -118,14 +118,14 @@ public class LabFlow extends LoginAndLocationTest {
 
         fillTextareaField("testDescription", "description value");
 
-        String packageOnly = "Yes";
+        String packageOnly = "No";
         selectRadioButton("packageOnly", packageOnly, "");
 
+        String performanceType = "Outsource";
 
         if (packageOnly.contains("Yes")) {
         } else {
             //performance type : =Inhouse and Outsource
-            String performanceType = "Inhouse";
             selectRadioButton("performanceType", performanceType, "");
 
             if (performanceType.equals("Outsource")) {
@@ -219,7 +219,31 @@ public class LabFlow extends LoginAndLocationTest {
 
 
             multipleElementSaveAndClose("procedureForm");
+
+            threadTimer(2000);
+
         }
+        System.out.println("complete lab Test flow PO " + packageOnly + "| PT:" + performanceType);
+        System.out.println("charges added to lab name" + labTestName);
+        if (packageOnly.equals("No")) {
+            if (performanceType.equals("Outsource")) {
+                switchChargeTap(labTestName);
+            }
+        }
+    }
+
+    private void switchChargeTap(String labTestName) {
+
+
+        menuPanelClick("Master", true, "Charges", "");
+        clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
+
+        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
+        )));
+
+        row.findElement(By.xpath(".//button[@title='Edit']")).click();
+
     }
 
     private void selectFieldUsingXPath(String xpath, String uomName) {
