@@ -201,7 +201,7 @@ public class LabFlow extends LoginAndLocationTest {
 
                 fillTextareaField("valueStr", "test desc");
 
-                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[3]/app-select/div/select", uomName);
+                selectFieldUsingXPath("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName);
             } else if (labResultTypeId.equals("Drop-Down")) {
                 System.out.println("selected " + labResultTypeId);
                 WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
@@ -215,7 +215,7 @@ public class LabFlow extends LoginAndLocationTest {
                 }
                 fillTheTextFieldInTitle("Options", "Test");
 
-                selectFieldUsingXPath("//*[@id=\"procedureForm\"]/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName);
+                selectFieldUsingXPath("//*[@id='procedureFor']/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName);
             }
 
 
