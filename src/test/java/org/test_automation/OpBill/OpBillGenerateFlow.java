@@ -225,19 +225,6 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
         closePrintScreen(); // Close the print screen
     }
 
-    // Helper method to close the print screen
-    private void closePrintScreen() {
-        try {
-            Robot robot = new Robot();
-            robot.delay(1000); // Wait before sending key
-            robot.keyPress(KeyEvent.VK_ESCAPE); // Press escape key
-            robot.keyRelease(KeyEvent.VK_ESCAPE); // Release escape key
-            threadTimer(4000); // Wait for the screen to close
-        } catch (AWTException ignored) {
-            ignored.printStackTrace();
-        }
-    }
-
     // Helper method to click an element
     private void clickElement(By locator) {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));

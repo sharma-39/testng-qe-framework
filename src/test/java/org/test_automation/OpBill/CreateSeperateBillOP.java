@@ -235,18 +235,7 @@ public class CreateSeperateBillOP extends LoginAndLocationTest {
         closePrintScreen();
     }
 
-    // Helper method to close the print screen
-    private void closePrintScreen() {
-        try {
-            Robot robot = new Robot();
-            robot.delay(1000); // Wait before sending key
-            robot.keyPress(KeyEvent.VK_ESCAPE);
-            robot.keyRelease(KeyEvent.VK_ESCAPE);
-            threadTimer(4000);
-        } catch (AWTException ignored) {
-            ignored.printStackTrace();
-        }
-    }
+
 
     // Helper method to click an element
     private void clickElement(By locator) {

@@ -484,59 +484,6 @@ public class OpBillFlow extends LoginAndLocationTest {
         });
     }
 
-    public void selectDatePicker(String dateValue, String formFieldId) {
-
-        WebElement datePickerContainer = driver.findElement(By.id(formFieldId));
-        datePickerContainer.click();
-        System.out.println("date value: " + dateValue);// "05-05-1994"
-
-        String[] dateFormat = dateValue.split("-");
-        String dateText = String.valueOf(Integer.parseInt(dateFormat[0])); // Day
-        String monthText = convertMMToMonth(dateFormat[1]); // Convert MM to Month name
-        String yearText = dateFormat[2]; // Year
-
-        System.out.println("date: " + dateText + " month: " + monthText + " year: " + yearText);
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-
-        // Select Year
-        WebElement yearDropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.yearselect")));
-        Select selectYear = new Select(yearDropdown);
-        selectYear.selectByVisibleText(yearText);
-        System.out.println("Selected Year: " + yearText);
-
-        // Wait for the month dropdown to be ready
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.yearselect"), yearText));
-
-        // Select Month
-        WebElement monthDropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] select.monthselect")));
-        Select selectMonth = new Select(monthDropdown);
-        selectMonth.selectByVisibleText(monthText);
-        System.out.println("Selected Month: " + monthText);
-
-        // Wait for the day picker to refresh
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.daterangepicker[style*='display: block'] td.available")));
-
-        // Select Day
-        List<WebElement> days = driver.findElements(By.cssSelector("div.daterangepicker[style*='display: block'] td.available"));
-        for (WebElement day : days) {
-            System.out.println("get Days" + day.getText());
-            if (day.getText().trim().equals(dateText)) { // Fixing Integer.parseInt issue
-                day.click();
-                System.out.println("Selected Day: " + dateText);
-                break;
-            }
-        }
-        System.out.println("Date selection complete.");
-        threadTimer(2000);
-    }
-
-
-    public String convertMMToMonth(String monthNumber) {
-        int monthInt = Integer.parseInt(monthNumber);
-        return Month.of(monthInt).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-    }
-
     private void selectFromMatSelectDropdown(WebDriver driver, WebDriverWait wait, String matSelectId, String optionText) {
 
         try {
@@ -631,15 +578,5 @@ public class OpBillFlow extends LoginAndLocationTest {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
     }
 
-    private void closePrintScreen() {
-        try {
-            Robot robot = new Robot();
-            robot.delay(1000); // Wait before sending key
-            robot.keyPress(KeyEvent.VK_ESCAPE); // Press escape key
-            robot.keyRelease(KeyEvent.VK_ESCAPE); // Release escape key
-            threadTimer(4000); // Wait for the screen to close
-        } catch (AWTException ignored) {
-            ignored.printStackTrace();
-        }
-    }
+
 }
