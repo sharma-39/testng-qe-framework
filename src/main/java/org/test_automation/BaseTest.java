@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.*;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -239,7 +241,7 @@ public class BaseTest {
     }
 
     public void clickButtonElement(By locator) {
-        System.out.println("locater" + locator);
+        //System.out.println("locater" + locator);
         threadTimer(500);
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
@@ -382,5 +384,17 @@ public class BaseTest {
     public String convertMMToMonth(String monthNumber) {
         int monthInt = Integer.parseInt(monthNumber);
         return Month.of(monthInt).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+    }
+
+    private void printScreenClose() {
+        try {
+            Robot robot = new Robot();
+            robot.delay(1000); // Wait before sending key
+            robot.keyPress(KeyEvent.VK_ESCAPE); // Press escape key
+            robot.keyRelease(KeyEvent.VK_ESCAPE); // Release escape key
+            threadTimer(4000); // Wait for the screen to close
+        } catch (AWTException ignored) {
+            ignored.printStackTrace();
+        }
     }
 }
