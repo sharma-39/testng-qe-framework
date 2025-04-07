@@ -260,13 +260,12 @@ public class BaseTest {
 
     public void filterSearchClick() {
 
-
-// Wait until the button is clickable
+     // Wait until the button is clickable
         WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[@title='Search']")
         ));
 
-// Scroll into view
+     // Scroll into view
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", searchButton);
         try {
             Thread.sleep(500); // Small wait for smooth UI

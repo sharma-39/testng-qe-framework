@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [AutomationSuite]" guice-stage="DEVELOPMENT" verbose="0">
+  <listeners>
+    <listener class-name="org.test_automation.Listener.AllTestListener"/>
+  </listeners>
+  <test thread-count="5" name="LoginTests(failed)" verbose="0">
+    <classes>
+      <class name="org.test_automation.LabFlow.LabFlow">
+        <methods>
+          <include name="labMasterCreate"/>
+          <include name="tearDownSuite"/>
+          <include name="setUpSuite"/>
+          <include name="setUpClass"/>
+          <include name="testLocationSelection"/>
+          <include name="setUp"/>
+          <include name="tearDownClass"/>
+          <include name="testLogin"/>
+          <include name="switchChargeTap"/>
+        </methods>
+      </class> <!-- org.test_automation.LabFlow.LabFlow -->
+    </classes>
+  </test> <!-- LoginTests(failed) -->
+</suite> <!-- Failed suite [AutomationSuite] -->

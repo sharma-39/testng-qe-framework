@@ -1,3 +1,3 @@
-org\example\BaseTest.class
-org\example\ConfigReader.class
-org\example\UserDetails.class
+org\test_automation\ConfigReader.class
+org\test_automation\UserDetails.class
+org\test_automation\BaseTest.class
