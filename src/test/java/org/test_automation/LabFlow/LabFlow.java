@@ -24,20 +24,17 @@ public class LabFlow extends LoginAndLocationTest {
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
-    private String patientCode; // Stores the patient code
-    private boolean isAppointmentCreated = false; // Flag to check if appointment is created
-    private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
-
-    private final Boolean basicLabFlow =true;
+    private final Boolean basicLabFlow = true;
     private final Boolean basicPatientToCheckin = true;
+    private final XPathUtil xPathUtil;
     Boolean addCharges = false;
     String labGroupName;
     String specimenName;
     String uomName;
-
     String labTestName;
-
-    private final XPathUtil xPathUtil;
+    private String patientCode; // Stores the patient code
+    private boolean isAppointmentCreated = false; // Flag to check if appointment is created
+    private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
 
     public LabFlow() {
         this.patientFlowHelper = new PatientFlowHelper();
@@ -349,8 +346,6 @@ public class LabFlow extends LoginAndLocationTest {
         menuPanelClick("Lab", false, "", "");
 
         threadTimer(3000); // Wait for the page to load
-
-        List<String> status = Arrays.asList("Partially Paid", "Paid");
         int discount = 50;
         // Get pagination details
         int totalPages = getPaginationDetails();
@@ -769,14 +764,6 @@ public class LabFlow extends LoginAndLocationTest {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
     }
 
-
-    public enum DropdownType {
-        STANDARD,       // HTML <select> with formControlName
-        ANGULAR_TITLE,  // Angular component with title attribute
-        MATERIAL,       // Material-UI <mat-select>
-        XPATH           // Custom XPath locator
-    }
-
     /**
      * Universal dropdown selector supporting multiple UI technologies
      *
@@ -809,8 +796,6 @@ public class LabFlow extends LoginAndLocationTest {
         }
     }
 
-    // ================== HANDLER IMPLEMENTATIONS ================== //
-
     private void handleStandardSelect(String formControlName, String value) {
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector("select[formcontrolname='" + formControlName + "'], " +
@@ -818,6 +803,8 @@ public class LabFlow extends LoginAndLocationTest {
         ));
         new Select(dropdown).selectByVisibleText(value);
     }
+
+    // ================== HANDLER IMPLEMENTATIONS ================== //
 
     private void handleAngularTitleSelect(String title, String value) {
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
@@ -845,7 +832,6 @@ public class LabFlow extends LoginAndLocationTest {
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
         new Select(dropdown).selectByVisibleText(value);
     }
-
 
     public WebElement findAndClickDropdownAndPrescription(String patientCode, WebDriverWait wait, WebDriver driver, String dropDownName) {
         WebElement row = null;
@@ -900,5 +886,13 @@ public class LabFlow extends LoginAndLocationTest {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+
+    public enum DropdownType {
+        STANDARD,       // HTML <select> with formControlName
+        ANGULAR_TITLE,  // Angular component with title attribute
+        MATERIAL,       // Material-UI <mat-select>
+        XPATH           // Custom XPath locator
     }
 }
