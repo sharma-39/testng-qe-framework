@@ -348,7 +348,7 @@ public class LabFlow extends LoginAndLocationTest {
     @Test(priority = 8)
     private void paidFlow() {
 
-        patientCode="INI-57";
+        patientCode = "INI-57";
         menuPanelClick("Lab", false, "", "");
 
         threadTimer(3000); // Wait for the page to load
@@ -419,15 +419,7 @@ public class LabFlow extends LoginAndLocationTest {
                     WebElement amountInput = row.findElement(By.xpath(".//td[contains(@class, 'text-right')]//input[@type='number']"));
 
                     if (amountInput.isDisplayed()) {
-                        scrollToElement(amountInput); // Scroll to the input field
-                        if (statusText.equals("Partially Paid")) {
-                            amountInput.clear();
-                            amountInput.sendKeys(String.valueOf(Math.round(Integer.parseInt(finalAmount) / 2))); // Enter half amount for partial payment
-                        } else {
-                            amountInput.clear();
-                            amountInput.sendKeys(String.valueOf(Math.round(Float.parseFloat(finalAmount) - Float.parseFloat(totalPaidAmount)))); // Enter remaining amount
-                        }
-                        System.out.println("✅ Filled Amount Field in Row " + (i + 1));
+                        amountInput.sendKeys(String.valueOf(Math.round(Integer.parseInt(finalAmount))));
                     }
                 } catch (NoSuchElementException e) {
                     System.out.println("❌ No Amount Field Found in Row " + (i + 1));
