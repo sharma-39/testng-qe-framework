@@ -316,7 +316,7 @@ public class PharmacyBillHelper {
         try {
 
             baseTest.filterSearchClick();
-            baseTest.filterSearchElemenet(patientCode, "patientCode", "Text");
+            baseTest.filterSearchElemenet(patientCode, "Patient Code", "Text");
             WebElement patientRow = findAndClickDropdownAndPrescription(patientCode, wait, driver);
             if (patientRow != null) {
 

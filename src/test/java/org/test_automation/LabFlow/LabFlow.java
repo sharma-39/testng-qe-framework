@@ -30,7 +30,7 @@ public class LabFlow extends LoginAndLocationTest {
 
     private final Boolean basicLabFlow = false;
     private final Boolean basicPatientToCheckin = false;
-    Boolean chargesTap = false;
+    Boolean addCharges = false;
     String labGroupName;
     String specimenName;
     String uomName;
@@ -140,7 +140,7 @@ public class LabFlow extends LoginAndLocationTest {
             String packageOnly = "No";
             optionSelect("packageOnly", packageOnly, "");
 
-            String performanceType = "Outsource";
+            String performanceType = "Inhouse";
 
             if (packageOnly.contains("Yes")) {
             } else {
@@ -160,7 +160,8 @@ public class LabFlow extends LoginAndLocationTest {
 
             formSubmitWithFormId("labTestForm");
 
-            if (packageOnly.equals("Yes")) {
+            if (performanceType.equals("Inhouse")) {
+
 
                 WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                         By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
@@ -178,7 +179,7 @@ public class LabFlow extends LoginAndLocationTest {
 
                 optionSelect("resultHelpValue", "Yes", "");
 
-                String labResultTypeId = "Drop-Down";
+                String labResultTypeId = "Range";
 
                 selectField("labResultTypeId", labResultTypeId, DropdownType.STANDARD);
 
@@ -244,13 +245,7 @@ public class LabFlow extends LoginAndLocationTest {
                 threadTimer(2000);
 
             }
-            System.out.println("complete lab Test flow PO " + packageOnly + "| PT:" + performanceType);
-            System.out.println("charges added to lab name" + labTestName);
-            if (packageOnly.equals("No")) {
-                if (performanceType.equals("Outsource")) {
-                    chargesTap = true;
-                }
-            }
+            addCharges = true;
         }
     }
 
@@ -258,7 +253,7 @@ public class LabFlow extends LoginAndLocationTest {
     @Test(priority = 5)
     public void switchChargeTap() {
 
-        if (chargesTap) {
+        if (addCharges) {
 
             menuPanelClick("Master", true, "Charges", "");
             threadTimer(2000);
@@ -340,10 +335,8 @@ public class LabFlow extends LoginAndLocationTest {
 
                     if (isAppointmentCheckedIn) {
                         // Navigate to the Lab Flow
-
                         labFlow();
-
-
+                        paidFlow();
                     }
 
 
@@ -353,9 +346,181 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     @Test(priority = 8)
+    private void paidFlow() {
+
+        patientCode="INI-57";
+        menuPanelClick("Lab", false, "", "");
+
+        threadTimer(3000); // Wait for the page to load
+
+        List<String> status = Arrays.asList("Partially Paid", "Paid");
+        for (int i = 0; i < status.size(); i++) {
+            String statusText = status.get(i);
+            int discount = 50;
+            // Get pagination details
+            int totalPages = getPaginationDetails();
+            System.out.println("Total Pages: " + totalPages);
+            System.out.println("Patient Code: " + patientCode);
+
+            filterSearchClick();
+            filterSearchElemenet(patientCode, "Patient Code", "Text");
+
+            System.out.println("Successfully selected");
+            // Find the row with the patient code and process billing
+            if (findRow(patientCode, "View Bill", "Success", totalPages)) {
+                if (statusText.equals("Partially Paid")) {
+                    amountTabClick(); // Click the amount tab
+                    enterAmounts(statusText, discount); // Enter amounts
+                }
+                threadTimer(3000); // Wait for the UI to update
+                submitBilling(); // Submit the billing
+            }
+        }
+    }
+
+    // Helper method to submit billing
+    private void submitBilling() {
+        clickButtonElement(By.xpath("//label[contains(text(), 'Remarks')]")); // Click remarks
+        clickButtonElement(By.xpath("//button[contains(text(), 'Pay Bill')]")); // Click pay bill
+        threadTimer(3000); // Wait for the UI to update
+        clickButtonElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]")); // Confirm payment
+        threadTimer(5000); // Wait for the payment to process
+        closePrintScreen(); // Close the print screen
+    }
+
+
+    private void enterAmounts(String statusText, int discount) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        try {
+            fillDiscountAmount("Overall Discount Percentage", discount); // Fill discount amount
+
+            // Get all table rows inside tbodyIn2
+            List<WebElement> rows = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+                    By.xpath("//tbody[@id='tbodyIn2']/tr")
+            ));
+
+            // Get the final amount and total paid amount
+            WebElement finalAmountElement = driver.findElement(By.xpath("//tr[th[contains(text(), 'Final Amount')]]/td"));
+            String finalAmount = finalAmountElement.getText().replaceAll("[^0-9]", "");
+            WebElement finalTotalPaidElement = driver.findElement(By.xpath("//tr[th[contains(text(), 'Total Paid Amount')]]/td"));
+            String totalPaidAmount = finalTotalPaidElement.getText().replaceAll("[^0-9]", "");
+
+            System.out.println("Total rows found: " + rows.size());
+
+            // Iterate through rows and fill amounts
+            for (int i = 0; i < rows.size(); i++) {
+                try {
+                    // Re-fetch rows each iteration to prevent stale elements
+                    rows = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//tbody[@id='tbodyIn2']/tr")));
+                    WebElement row = rows.get(i);
+
+                    // Locate the "Amount" input field inside the refreshed row
+                    WebElement amountInput = row.findElement(By.xpath(".//td[contains(@class, 'text-right')]//input[@type='number']"));
+
+                    if (amountInput.isDisplayed()) {
+                        scrollToElement(amountInput); // Scroll to the input field
+                        if (statusText.equals("Partially Paid")) {
+                            amountInput.clear();
+                            amountInput.sendKeys(String.valueOf(Math.round(Integer.parseInt(finalAmount) / 2))); // Enter half amount for partial payment
+                        } else {
+                            amountInput.clear();
+                            amountInput.sendKeys(String.valueOf(Math.round(Float.parseFloat(finalAmount) - Float.parseFloat(totalPaidAmount)))); // Enter remaining amount
+                        }
+                        System.out.println("✅ Filled Amount Field in Row " + (i + 1));
+                    }
+                } catch (NoSuchElementException e) {
+                    System.out.println("❌ No Amount Field Found in Row " + (i + 1));
+                } catch (StaleElementReferenceException e) {
+                    System.out.println("🔄 Stale element detected. Retrying Row " + (i + 1));
+                    i--; // Retry the same row
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error: " + e.getMessage());
+        }
+    }
+
+    private void amountTabClick() {
+        WebElement table = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//table[contains(@class, 'hm-p table-disable-hover')]")
+        ));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", table); // Scroll to the table
+        table.click(); // Click the table
+    }
+
+    // Helper method to fill the discount amount
+    private void fillDiscountAmount(String label, int discount) {
+        WebElement discountAmountField = driver.findElement(By.xpath("//tr[th[contains(text(),'" + label + "')]]//input"));
+        discountAmountField.clear(); // Clear the field
+        discountAmountField.sendKeys(String.valueOf(discount)); // Enter the discount amount
+    }
+
+    // Helper method to find a row by patient code and status
+    public Boolean findRow(String patientCode, String title, String status, int totalPages) {
+        boolean isFound = false;
+        int currentPage = 1;
+
+        while (!isFound && currentPage <= totalPages) {
+            // Re-fetch the table rows after each page change
+            List<WebElement> rows = driver.findElements(By.xpath("//table//tr"));
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i).getText().contains(patientCode)) {
+                    System.out.println("Row Found at Index: " + (i + 1));
+
+                    // Highlight the row
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+                    js.executeScript("arguments[0].style.backgroundColor = 'yellow'", rows.get(i));
+
+                    System.out.println("Row Highlighted!");
+                    isFound = true;
+                    WebElement viewButton = rows.get(i).findElement(By.xpath(".//button[@title='" + title + "']"));
+                    scrollToElement(viewButton); // Scroll to the button
+                    viewButton.click(); // Click the button
+                    break;
+                }
+            }
+
+            if (!isFound) {
+                try {
+                    currentPage++; // Increment before clicking
+                    System.out.println("click index of page number" + currentPage);
+                    WebElement pageNo = wait.until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//ul[contains(@class, 'ngx-pagination')]//li/a/span[text()='" + currentPage + "']")
+                    ));
+
+                    // Scroll into view and click the next page button
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", pageNo);
+                    Thread.sleep(500); // Small delay for UI adjustment
+                    pageNo.click(); // Click the next page button
+                    Thread.sleep(3000); // Allow time for the new page to load
+                } catch (Exception e) {
+                    System.out.println("Pagination button not found or not clickable.");
+                    break;
+                }
+            }
+        }
+
+        if (!isFound) {
+            System.out.println("Patient Code not found in any pages.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private int getPaginationDetails() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        String pageText = (String) js.executeScript("return document.querySelector('li.small-screen')?.textContent.trim();");
+
+        if (pageText != null && !pageText.isEmpty()) {
+            String[] pageParts = pageText.split("/");
+            return Integer.parseInt(pageParts[1].trim());
+        }
+        return 1; // Default to 1 page if pagination is not found
+    }
+
     private void labFlow() {
-        labTestName = "Lab Test-2037";
-        patientCode = "INI-57";
         menuPanelClick("Current Admissions", false, "", "");
 
         WebElement patientRow = findAndClickDropdownAndPrescription(patientCode, wait, driver, "Lab");
@@ -375,7 +540,7 @@ public class LabFlow extends LoginAndLocationTest {
             try {
                 // Try to find <input> first
                 inputField = driver.findElement(By.xpath("//td[@class='tbody1-al']//input[@type='text']"));
-                inputField.sendKeys(labTestName); // e.g., "Tes" or "India" based on context
+                inputField.sendKeys(labTestName);
 
 
 // 3. Wait for autocomplete suggestions to appear and select the one you want
