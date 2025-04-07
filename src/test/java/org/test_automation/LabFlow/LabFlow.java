@@ -28,8 +28,8 @@ public class LabFlow extends LoginAndLocationTest {
     private boolean isAppointmentCreated = false; // Flag to check if appointment is created
     private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
 
-    private final Boolean basicLabFlow = false;
-    private final Boolean basicPatientToCheckin = false;
+    private final Boolean basicLabFlow =true;
+    private final Boolean basicPatientToCheckin = true;
     Boolean addCharges = false;
     String labGroupName;
     String specimenName;
@@ -345,37 +345,30 @@ public class LabFlow extends LoginAndLocationTest {
         }
     }
 
-    @Test(priority = 8)
     private void paidFlow() {
-
-        patientCode = "INI-57";
         menuPanelClick("Lab", false, "", "");
 
         threadTimer(3000); // Wait for the page to load
 
         List<String> status = Arrays.asList("Partially Paid", "Paid");
-        for (int i = 0; i < status.size(); i++) {
-            String statusText = status.get(i);
-            int discount = 50;
-            // Get pagination details
-            int totalPages = getPaginationDetails();
-            System.out.println("Total Pages: " + totalPages);
-            System.out.println("Patient Code: " + patientCode);
+        int discount = 50;
+        // Get pagination details
+        int totalPages = getPaginationDetails();
+        System.out.println("Total Pages: " + totalPages);
+        System.out.println("Patient Code: " + patientCode);
 
-            filterSearchClick();
-            filterSearchElemenet(patientCode, "Patient Code", "Text");
+        filterSearchClick();
+        filterSearchElemenet(patientCode, "Patient Code", "Text");
 
-            System.out.println("Successfully selected");
-            // Find the row with the patient code and process billing
-            if (findRow(patientCode, "View Bill", "Success", totalPages)) {
-                if (statusText.equals("Partially Paid")) {
-                    amountTabClick(); // Click the amount tab
-                    enterAmounts(statusText, discount); // Enter amounts
-                }
-                threadTimer(3000); // Wait for the UI to update
-                submitBilling(); // Submit the billing
-            }
+        System.out.println("Successfully selected");
+        // Find the row with the patient code and process billing
+        if (findRow(patientCode, "View Bill", "Success", totalPages)) {
+            amountTabClick(); // Click the amount tab
+            enterAmounts(discount); // Enter amounts
+            threadTimer(3000); // Wait for the UI to update
+            submitBilling(); // Submit the billing
         }
+
     }
 
     // Helper method to submit billing
@@ -389,7 +382,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
 
-    private void enterAmounts(String statusText, int discount) {
+    private void enterAmounts(int discount) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         try {
