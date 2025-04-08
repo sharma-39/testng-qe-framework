@@ -28,9 +28,9 @@ public class LabFlow extends LoginAndLocationTest {
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
-    private final Boolean basicLabFlow =true;
+    private final Boolean basicLabFlow = true;
     private final Boolean basicPatientToCheckin = true;
-    private final Boolean chargesFlow=true;
+    private final Boolean chargesFlow = true;
     private final XPathUtil xPathUtil;
     Boolean addCharges = false;
     String labGroupName;
@@ -380,7 +380,9 @@ public class LabFlow extends LoginAndLocationTest {
             // XPath to locate all result inputs in relevant tables
             String xpath =
                     "//table[.//th[contains(translate(., 'RESULT', 'result'), 'result')]]" +
-                            "//tr[td]/td[3]//input[@type='text']";
+                            "//tr[td]/td[3]//input[@type='text']  | " +  // Text input
+                            "//tr[td]/td[3]//select";
+
 
             // Wait for all result inputs to be visible
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -392,12 +394,16 @@ public class LabFlow extends LoginAndLocationTest {
             int i = 1;
             for (WebElement input : resultInputs) {
                 // Get the associated test name (from the second column)
-                WebElement testName = input.findElement(
-                        By.xpath("./ancestor::tr/td[2]")
-                );
-                System.out.println("Test: " + testName.getText());
-                if (input.isEnabled() && input.isDisplayed()) {
-                    input.sendKeys("55" + i++);
+                System.out.println("Test:   Tag name" + input.getTagName());
+                if (input.getTagName().equalsIgnoreCase("input")) {
+                    if (input.isEnabled() && input.isDisplayed()) {
+                        input.sendKeys("55" + i++);
+                    }
+                } else if (input.getTagName().equalsIgnoreCase("select")) {
+                    // Handle dropdown (select index 1)
+                    Select dropdown = new Select(input);
+                    dropdown.selectByIndex(1); // Select second option (index 1)
+                    System.out.println("Dropdown selected: " + dropdown.getFirstSelectedOption().getText());
                 }
                 WebElement resultInput = input.findElement(By.xpath(
                         "./ancestor::tr/td[1]//input[@type='checkbox' and not(@disabled)]"
