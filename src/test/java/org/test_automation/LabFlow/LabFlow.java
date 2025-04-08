@@ -24,8 +24,8 @@ public class LabFlow extends LoginAndLocationTest {
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
-    private final Boolean basicLabFlow = true;
-    private final Boolean basicPatientToCheckin = true;
+    private final Boolean basicLabFlow = false;
+    private final Boolean basicPatientToCheckin = false;
     private final XPathUtil xPathUtil;
     Boolean addCharges = false;
     String labGroupName;
@@ -171,7 +171,7 @@ public class LabFlow extends LoginAndLocationTest {
                 fillTheTextFieldInTitle("Age (From)", "5");
                 selectField("ageFromUnit", "Years", DropdownType.STANDARD);
 
-                fillTheTextFieldInTitle("Age (To)", "10");
+                fillTheTextFieldInTitle("Age (To)", "100");
                 selectField("ageToUnit", "Years", DropdownType.STANDARD);
 
                 optionSelect("resultHelpValue", "Yes", "");
@@ -333,6 +333,7 @@ public class LabFlow extends LoginAndLocationTest {
                     if (isAppointmentCheckedIn) {
                         // Navigate to the Lab Flow
                         labFlow();
+                        labTestResult();
                         paidFlow();
                     }
 
@@ -340,6 +341,60 @@ public class LabFlow extends LoginAndLocationTest {
                 }
             }
         }
+    }
+
+    @Test(priority = 10)
+    private void labTestResult() {
+        patientCode = "INI-60";
+        menuPanelClick("View Lab", false, "", "");
+
+        filterSearchClick();
+        filterSearchElemenet(patientCode, "Patient Code", "Text");
+        threadTimer(2000);
+        WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//td[span[contains(text(),'" + patientCode + "')]]/parent::tr")
+        )));
+
+        row.findElement(By.xpath(".//button[@title='View Test']")).click();
+
+        try {
+            // XPath to locate all result inputs in relevant tables
+            String xpath =
+                    "//table[.//th[contains(translate(., 'RESULT', 'result'), 'result')]]" +
+                            "//tr[td]/td[3]//input[@type='text']";
+
+            // Wait for all result inputs to be visible
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            List<WebElement> resultInputs = wait.until(
+                    ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(xpath))
+            );
+
+// Iterate through inputs and interact
+            int i = 1;
+            for (WebElement input : resultInputs) {
+                // Get the associated test name (from the second column)
+                WebElement testName = input.findElement(
+                        By.xpath("./ancestor::tr/td[2]")
+                );
+                System.out.println("Test: " + testName.getText());
+                if (input.isEnabled() && input.isDisplayed()) {
+                    input.sendKeys("55" + i++);
+                }
+                WebElement resultInput = input.findElement(By.xpath(
+                        "./ancestor::tr/td[1]//input[@type='checkbox' and not(@disabled)]"
+                ));
+                resultInput.click();
+                // Enter a value into the input fieldS
+
+            }
+        } catch (Exception e) {
+
+        }
+        WebElement saveCloseButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[contains(text(), 'Save')]")
+        ));
+
+        saveCloseButton.click();
     }
 
     private void paidFlow() {
