@@ -330,7 +330,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     @Test(priority = 7)
-    public void patientRegisterationToAppoinentcheckin() {
+    public void labFlowPatientRegisterToLabAdded() {
         if (basicPatientToCheckin) {
             JSONObject patient = tempPatientData.getJSONObject(5);
 
