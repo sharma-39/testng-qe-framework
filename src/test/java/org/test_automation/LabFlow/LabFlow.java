@@ -24,8 +24,8 @@ public class LabFlow extends LoginAndLocationTest {
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
-    private final Boolean basicLabFlow = false;
-    private final Boolean basicPatientToCheckin = false;
+    private final Boolean basicLabFlow = true;
+    private final Boolean basicPatientToCheckin = true;
     private final XPathUtil xPathUtil;
     Boolean addCharges = false;
     String labGroupName;
