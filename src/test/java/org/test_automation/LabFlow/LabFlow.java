@@ -1,37 +1,43 @@
 package org.test_automation.LabFlow;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
+import org.test_automation.VO.LabTestData;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 public class LabFlow extends LoginAndLocationTest {
 
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
-    private final Boolean basicLabFlow = true;
+    private final Boolean basicLabFlow =true;
     private final Boolean basicPatientToCheckin = true;
+    private final Boolean chargesFlow=true;
     private final XPathUtil xPathUtil;
     Boolean addCharges = false;
     String labGroupName;
     String specimenName;
     String uomName;
     String labTestName;
+    List<String> labTestNameBundle = new ArrayList<>();
     private String patientCode; // Stores the patient code
     private boolean isAppointmentCreated = false; // Flag to check if appointment is created
     private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
@@ -41,19 +47,31 @@ public class LabFlow extends LoginAndLocationTest {
         this.xPathUtil = new XPathUtil();
     }
 
-    @Test(priority = 4, description = "Lab Master", dependsOnMethods = "testLogin")
-    public void labMasterCreate() {
+    @DataProvider(name = "labTestData")
+    public Iterator<Object[]> provideLabTestData() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("lab_test_data.json");
+        List<LabTestData> testDataList = mapper.readValue(inputStream, new TypeReference<List<LabTestData>>() {
+        });
+        return testDataList.stream()
+                .map(data -> new Object[]{data})
+                .iterator();
+    }
+
+    @Test(priority = 4, description = "Lab Master", dependsOnMethods = "testLogin", dataProvider = "labTestData")
+    public void labMasterCreate(LabTestData data) {
+
         if (basicLabFlow) {
             menuPanelClick("Master", true, "Lab", "");
 
-            labGroupName = "Lab Group" + generateSequence();
+            labGroupName = data.getLabGroupName() + generateSequence(); // object
 
-            specimenName = "Spec" + generateSequence();
+            specimenName = data.getSpecimenName() + generateSequence();
 
-            String uomCode = "UOM-C" + generateSequence();
-            uomName = "UOM-N" + generateSequence();
+            String uomCode = data.getUomCode() + generateSequence();
+            uomName = data.getUomName() + generateSequence();
 
-            labTestName = "Lab Test" + generateSequence();
+            labTestName = data.getLabTestName() + generateSequence();
 
             threadTimer(2000);
             clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"));
@@ -116,28 +134,28 @@ public class LabFlow extends LoginAndLocationTest {
 
 
             fillTextField("labTestName", labTestName);
-            selectField("labGroupId", labGroupName, DropdownType.STANDARD);
-            selectField("labTypeId", "Basic", DropdownType.STANDARD);
+            selectField("labGroupId", labGroupName, DropdownType.STANDARD, "");
+            selectField("labTypeId", data.getLabTypeId(), DropdownType.STANDARD, "");
 
-            optionSelect("formulary", "Yes", "");
-            optionSelect("nrtForTheDay", "Yes", "");
-            optionSelect("nrtForTheStay", "Yes", "");
-            fillTextField("routineDuration", "10");
-            fillTextField("statDuration", "50");
+            optionSelect("formulary", data.getFormulary(), "");
+            optionSelect("nrtForTheDay", data.getNrtForTheDay(), "");
+            optionSelect("nrtForTheStay", data.getNrtForTheStay(), "");
+            fillTextField("routineDuration", data.getRoutineDuration());
+            fillTextField("statDuration", data.getStatDuration());
 
-            optionSelect("cultureTest", "Yes", "");
+            optionSelect("cultureTest", data.getCultureTest(), "");
 
             //   fillInputField("price","1000");
-            optionSelect("confidentialReport", "Yes", "");
+            optionSelect("confidentialReport", data.getConfidentialReport(), "");
 
-            optionSelect("active", "Active", "");
+            optionSelect("active", data.getActive(), "");
 
-            fillTextArea("testDescription", "description value");
+            fillTextArea("testDescription", data.getTestDescription());
 
-            String packageOnly = "No";
+            String packageOnly = data.getPackageOnly();
             optionSelect("packageOnly", packageOnly, "");
 
-            String performanceType = "Inhouse";
+            String performanceType = data.getPerformanceType();
 
             if (packageOnly.contains("Yes")) {
             } else {
@@ -146,19 +164,19 @@ public class LabFlow extends LoginAndLocationTest {
 
                 if (performanceType.equals("Outsource")) {
                     //type :Billable  and Report only
-                    optionSelect("serviceType", "Billable", "");
+                    optionSelect("serviceType", data.getServiceType(), "");
 
                 }
             }
 
-            selectField("Specimen Type", specimenName, DropdownType.ANGULAR_TITLE);
-            selectField("UOM", uomName, DropdownType.ANGULAR_TITLE);
+            selectField("Specimen Type", specimenName, DropdownType.ANGULAR_TITLE, "");
+            selectField("UOM", uomName, DropdownType.ANGULAR_TITLE, "");
 
 
             formSubmitWithFormId("labTestForm");
+            labTestNameBundle.add(labTestName);
 
             if (performanceType.equals("Inhouse")) {
-
 
                 WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                         By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
@@ -167,33 +185,33 @@ public class LabFlow extends LoginAndLocationTest {
                 row.findElement(By.xpath(".//button[@title='Add Result']")).click();
 
                 threadTimer(2000);
-                selectField("sex", "Male", DropdownType.STANDARD);
-                fillTheTextFieldInTitle("Age (From)", "5");
-                selectField("ageFromUnit", "Years", DropdownType.STANDARD);
+                selectField("sex", data.getSex(), DropdownType.STANDARD, "");
+                fillTheTextFieldInTitle("Age (From)", data.getAgeFrom());
+                selectField("ageFromUnit", data.getAgeFromUnit(), DropdownType.STANDARD, "");
 
-                fillTheTextFieldInTitle("Age (To)", "100");
-                selectField("ageToUnit", "Years", DropdownType.STANDARD);
+                fillTheTextFieldInTitle("Age (To)", data.getAgeTo());
+                selectField("ageToUnit", data.getAgeToUnit(), DropdownType.STANDARD, "");
 
-                optionSelect("resultHelpValue", "Yes", "");
+                optionSelect("resultHelpValue", data.getResultHelpValue(), "");
 
-                String labResultTypeId = "Range";
+                String labResultTypeId = data.getLabResultTypeId();
 
-                selectField("labResultTypeId", labResultTypeId, DropdownType.STANDARD);
+                selectField("labResultTypeId", labResultTypeId, DropdownType.STANDARD, "");
 
                 if (labResultTypeId.equals("Range")) {
                     System.out.println("selected " + labResultTypeId);
-                    fillTextField("low", "50");
-                    fillTextField("high", "100");
-                    selectField("uomId", uomName, DropdownType.STANDARD);
-                    fillTextField("criticallyLow", "10");
-                    fillTextField("criticallyHigh", "110");
-                    fillTextField("defaultValue", "10");
+                    fillTextField("low", data.getLabResult().getLow());
+                    fillTextField("high", data.getLabResult().getHigh());
+                    selectField("uomId", uomName, DropdownType.STANDARD, "");
+                    fillTextField("criticallyLow", data.getLabResult().getCriticallyLow());
+                    fillTextField("criticallyHigh", data.getLabResult().getCriticallyHigh());
+                    fillTextField("defaultValue", data.getLabResult().getDefaultValue());
                     //fillTextareaField("Description","test description");
 
                 } else if (labResultTypeId.equals("Multi-Range")) {
                     System.out.println("selected " + labResultTypeId);
 
-                    Boolean abnormalEnable = true;
+                    Boolean abnormalEnable = data.getLabResult().getAbnormal();
                     WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
                     ));
@@ -205,35 +223,35 @@ public class LabFlow extends LoginAndLocationTest {
                         }
                     }
                     // Modern type-safe selector
-                    selectField("Range", "<=", LabFlow.DropdownType.ANGULAR_TITLE);
-                    fillTheTextFieldInTitle("Value", "50");
+                    selectField("Range", data.getLabResult().getRange(), LabFlow.DropdownType.ANGULAR_TITLE, "");
+                    fillTheTextFieldInTitle("Value", data.getLabResult().getResultValue());
 
-                    fillTheTextFieldInTitle("Description", "Test desc");
+                    fillTheTextFieldInTitle("Description", data.getLabResult().getDescription());
 
                     //selectWithOutFormNameUsingTitle("UOM", uomName);
 
-                    selectField("//*[@id=\"procedureForm\"]/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName, DropdownType.XPATH);
+                    selectField("//*[@id='procedureForm']/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName, DropdownType.XPATH, "");
                 } else if (labResultTypeId.equals("Descriptive")) {
 
                     System.out.println("selected " + labResultTypeId);
 
-                    fillTextArea("valueStr", "test desc");
+                    fillTextArea("valueStr", data.getLabResult().getDescription());
 
-                    selectField("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName, DropdownType.XPATH);
+                    selectField("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName, DropdownType.XPATH, "");
                 } else if (labResultTypeId.equals("Drop-Down")) {
                     System.out.println("selected " + labResultTypeId);
                     WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//label[contains(., 'Abnormal')]/following-sibling::input[@type='checkbox']")
                     ));
-                    Boolean abnormalEnable = true;
+                    Boolean abnormalEnable = data.getLabResult().getAbnormal();
                     if (abnormalEnable) {
                         if (!abnormalCheckbox.isSelected()) {
                             abnormalCheckbox.click();
                         }
                     }
-                    fillTheTextFieldInTitle("Options", "Test");
+                    fillTheTextFieldInTitle("Options", data.getLabResult().getOptions());
 
-                    selectField("//*[@id='procedureFor']/div[1]/div[7]/div[2]/div[2]/app-select/div/select", uomName, DropdownType.XPATH);
+                    selectField("UOM", uomName, DropdownType.FORM_ID, "procedureForm");
                 }
 
 
@@ -243,6 +261,7 @@ public class LabFlow extends LoginAndLocationTest {
 
             }
             addCharges = true;
+
         }
     }
 
@@ -250,27 +269,29 @@ public class LabFlow extends LoginAndLocationTest {
     @Test(priority = 5)
     public void switchChargeTap() {
 
-        if (addCharges) {
-
+        if (chargesFlow) {
+            System.out.println("size:-- and data:--" + labTestNameBundle.toString());
             menuPanelClick("Master", true, "Charges", "");
-            threadTimer(2000);
-
             clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
+            for (int i = 0; i < labTestNameBundle.size(); i++) {
+                threadTimer(2000);
 
-            WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//td[span[contains(text(),'" + labTestName + "')]]/parent::tr")
-            )));
+                WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                        By.xpath("//td[span[contains(text(),'" + labTestNameBundle.get(i) + "')]]/parent::tr")
+                )));
 
-            row.findElement(By.xpath(".//button[@title='Edit']")).click();
+                row.findElement(By.xpath(".//button[@title='Edit']")).click();
 
-            String headerName = "HeaderHEAD-100155";
-            fillMatOptionField("headerName", headerName);
+                String headerName = "HeaderHEAD-100155";
+                fillMatOptionField("headerName", headerName);
 
 
-            selectField("uomId", "TEST-UOM", DropdownType.STANDARD);
-            fillTextField("unitPrice", "1000");
-            threadTimer(2000);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
+                selectField("uomId", "TEST-UOM", DropdownType.STANDARD, "");
+                fillTextField("unitPrice", "1000");
+                threadTimer(2000);
+                clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
+                threadTimer(3000);
+            }
         }
 
     }
@@ -343,7 +364,6 @@ public class LabFlow extends LoginAndLocationTest {
         }
     }
 
-    @Test(priority = 10)
     private void labTestResult() {
         menuPanelClick("View Lab", false, "", "");
 
@@ -561,56 +581,56 @@ public class LabFlow extends LoginAndLocationTest {
 
         if (patientRow != null) {
             System.out.println("Dropdown clicked successfully.");
-            threadTimer(1000);
-            WebElement addNewButton = driver.findElement(By.xpath("//div[contains(@class, 'addIcon-button')]/span[text()='Add New']"));
-            addNewButton.click();
-            // 1. Locate the input field inside the <td>
 
-            WebElement td = driver.findElement(By.xpath("//td[@class='tbody1-al']"));
+            for (int i = 0; i < labTestNameBundle.size(); i++) {
+                threadTimer(1000);
+                WebElement addNewButton = driver.findElement(By.xpath("//div[contains(@class, 'addIcon-button')]/span[text()='Add New']"));
+                addNewButton.click();
+                // 1. Locate the input field inside the <td>
 
-            WebElement inputField;
-            System.out.println("find tag name list" + td.getTagName());
+                WebElement td = driver.findElement(By.xpath("//td[@class='tbody1-al']"));
 
-            try {
-                // Try to find <input> first
-                inputField = driver.findElement(By.xpath("//td[@class='tbody1-al']//input[@type='text']"));
-                inputField.sendKeys(labTestName);
+                WebElement inputField;
+                System.out.println("find tag name list" + td.getTagName());
+
+                try {
+                    // Try to find <input> first
+                    inputField = driver.findElement(By.xpath("//td[@class='tbody1-al']//input[@type='text']"));
+                    inputField.sendKeys(labTestName);
 
 
 // 3. Wait for autocomplete suggestions to appear and select the one you want
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
-                WebElement suggestion = wait.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//mat-option//span[contains(text(), '" + labTestName + "')]") // match your suggestion
-                ));
+                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+                    WebElement suggestion = wait.until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//mat-option//span[contains(text(), '" + labTestNameBundle.get(i) + "')]") // match your suggestion
+                    ));
 
 // 4. Click the suggestion
-                suggestion.click();
+                    suggestion.click();
 
-                System.out.println("Input field found and text entered.");
-            } catch (InvalidArgumentException | NoSuchElementException e1) {
-                try {
+                    System.out.println("Input field found and text entered.");
+                } catch (InvalidArgumentException | NoSuchElementException e1) {
+                    try {
 
-                    WebElement matSelect = driver.findElement(By.xpath("//mat-select[@placeholder='Select']"));
+                        WebElement matSelect = driver.findElement(By.xpath("//mat-select[@placeholder='Select']"));
 
-                    matSelect.click();
+                        matSelect.click();
 
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                    WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
-                            By.xpath("//mat-option//span[contains(text(), '" + labTestName + "')]")
-                    ));
-                    option.click();
+                        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//mat-option//span[contains(text(), '" + labTestNameBundle.get(i) + "')]")
+                        ));
+                        option.click();
 
-                    System.out.println("mat-select option selected successfully.");
-                } catch (NoSuchElementException e2) {
-                    System.out.println();
+                        System.out.println("mat-select option selected successfully.");
+                    } catch (NoSuchElementException e2) {
+                        System.out.println();
+                    }
                 }
+
+                System.out.println("Autocomplete suggestion selected.");
+
             }
-
-
-            System.out.println("Autocomplete suggestion selected.");
-
-//                        addNewButton.click();
-
             WebElement saveCloseButton = wait.until(ExpectedConditions.elementToBeClickable(
                     By.cssSelector(".btn.btn-info.btn-sm.mr-2.saveNdClose.padng.ng-star-inserted")
             ));
@@ -824,8 +844,9 @@ public class LabFlow extends LoginAndLocationTest {
      * @param identifier - locator value (formControlName, title, XPath, etc.)
      * @param value      - value to select
      * @param type       - dropdown type enum
+     * @param formId
      */
-    public void selectField(String identifier, String value, DropdownType type) {
+    public void selectField(String identifier, String value, DropdownType type, String formId) {
         try {
             switch (type) {
                 case STANDARD:
@@ -840,6 +861,16 @@ public class LabFlow extends LoginAndLocationTest {
                 case XPATH:
                     handleXPathSelect(identifier, value);
                     break;
+
+                case NORMAL_SELECT:
+                    handleNormalSelect(identifier, value);
+                    break;
+                case FORM_ID:
+                    handleFormSelect(formId, identifier, value);
+                    break;
+
+                case NG_SELECT:
+                    ngSelect(identifier, value);
                 default:
                     throw new IllegalArgumentException("Unsupported dropdown type: " + type);
             }
@@ -848,6 +879,49 @@ public class LabFlow extends LoginAndLocationTest {
             System.err.println("Failed to select '" + value + "' in " + type + " dropdown: " + e.getMessage());
             throw e;
         }
+    }
+
+    private void ngSelect(String identifier, String value) {
+        // Step 1: Locate the ng-select dropdown and click to open it
+        WebElement ngSelectDropdown = driver.findElement(By.cssSelector("ng-select[title='" + identifier + "']"));
+        ngSelectDropdown.click();
+
+// Step 2: Wait until the dropdown options are visible
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("ng-dropdown-panel .ng-dropdown-panel-items")));
+
+// Step 3: Select the desired option by its visible text
+        List<WebElement> options = driver.findElements(By.cssSelector("ng-dropdown-panel .ng-option"));
+        for (WebElement option : options) {
+            if (option.getText().equals(value)) {
+                option.click();
+                break;
+            }
+        }
+
+    }
+
+
+    private void handleNormalSelect(String identifier, String value) {
+
+        System.out.println("identifier::====" + value);
+        System.out.println("value::====" + value);
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("select[title='" + identifier + "']")));
+        threadTimer(2000);
+
+        new Select(dropdown).selectByVisibleText(value);
+
+    }
+
+    private void handleFormSelect(String formId, String identifier, String value) {
+        WebElement uomDropdown = driver.findElement(By.xpath("//form[@id='" + formId + "']//select[@title='" + identifier + "']"));
+
+
+        threadTimer(2000);
+
+        new Select(uomDropdown).selectByVisibleText(value);
+
     }
 
     private void handleStandardSelect(String formControlName, String value) {
@@ -947,6 +1021,9 @@ public class LabFlow extends LoginAndLocationTest {
         STANDARD,       // HTML <select> with formControlName
         ANGULAR_TITLE,  // Angular component with title attribute
         MATERIAL,       // Material-UI <mat-select>
-        XPATH           // Custom XPath locator
+        XPATH,
+        NORMAL_SELECT,
+        NG_SELECT,
+        FORM_ID,// Custom XPath locator
     }
 }
