@@ -345,7 +345,6 @@ public class LabFlow extends LoginAndLocationTest {
 
     @Test(priority = 10)
     private void labTestResult() {
-        patientCode = "INI-60";
         menuPanelClick("View Lab", false, "", "");
 
         filterSearchClick();
