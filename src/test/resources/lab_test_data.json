@@ -1,5 +1,6 @@
 [
   {
+    "index": 0,
     "labGroupName": "LabGroup",
     "specimenName": "Spec",
     "uomCode": "UOM-C",
@@ -25,6 +26,9 @@
     "ageToUnit": "Years",
     "resultHelpValue": "Yes",
     "labResultTypeId": "Range",
+    "headerName": "HeaderHEAD-100155",
+    "uomId": "TEST-UOM",
+    "unitPrice": "1000",
     "labResult": {
       "low": "50",
       "high": "100",
@@ -34,6 +38,7 @@
     }
   },
   {
+    "index": 1,
     "labGroupName": "LabGroup",
     "specimenName": "Spec",
     "uomCode": "UOM-C",
@@ -59,6 +64,9 @@
     "ageToUnit": "Years",
     "resultHelpValue": "Yes",
     "labResultTypeId": "Multi-Range",
+    "headerName": "HeaderHEAD-100155",
+    "uomId": "TEST-UOM",
+    "unitPrice": "1000",
     "labResult": {
       "abnormal": true,
       "description": "test description",
@@ -67,6 +75,7 @@
     }
   },
   {
+    "index": 2,
     "labGroupName": "LabGroup",
     "specimenName": "Spec",
     "uomCode": "UOM-C",
@@ -92,12 +101,16 @@
     "ageToUnit": "Years",
     "resultHelpValue": "Yes",
     "labResultTypeId": "Descriptive",
+    "headerName": "HeaderHEAD-100155",
+    "uomId": "TEST-UOM",
+    "unitPrice": "1000",
     "labResult": {
       "description": "test description",
       "resultValue": "50"
     }
   },
   {
+    "index": 3,
     "labGroupName": "LabGroup",
     "specimenName": "Spec",
     "uomCode": "UOM-C",
@@ -123,6 +136,9 @@
     "ageToUnit": "Years",
     "resultHelpValue": "Yes",
     "labResultTypeId": "Drop-Down",
+    "headerName": "HeaderHEAD-100155",
+    "uomId": "TEST-UOM",
+    "unitPrice": "1000",
     "labResult": {
       "description": "test description",
       "options": "50",

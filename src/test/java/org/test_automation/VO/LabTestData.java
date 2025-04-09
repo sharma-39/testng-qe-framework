@@ -3,6 +3,7 @@ package org.test_automation.VO;
 import java.util.List;
 
 public class LabTestData {
+    private Integer index;
     private String labGroupName;
     private String specimenName;
     private String uomCode;
@@ -29,6 +30,10 @@ public class LabTestData {
     private String resultHelpValue;
     private String labResultTypeId;
     private LabResult labResult;
+    private String headerName;
+    private String uomId;
+    private String unitPrice;
+
 
     public String getLabGroupName() {
         return labGroupName;
@@ -236,6 +241,38 @@ public class LabTestData {
 
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
+    public String getHeaderName() {
+        return headerName;
+    }
+
+    public void setHeaderName(String headerName) {
+        this.headerName = headerName;
+    }
+
+    public String getUomId() {
+        return uomId;
+    }
+
+    public void setUomId(String uomId) {
+        this.uomId = uomId;
+    }
+
+    public String getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(String unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }
 

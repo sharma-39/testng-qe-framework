@@ -266,32 +266,30 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
 
-    @Test(priority = 5)
-    public void switchChargeTap() {
-
+    @Test(priority = 5, dataProvider = "labTestData")
+    public void switchChargeTap(LabTestData data) {
         if (chargesFlow) {
             System.out.println("size:-- and data:--" + labTestNameBundle.toString());
             menuPanelClick("Master", true, "Charges", "");
             clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
-            for (int i = 0; i < labTestNameBundle.size(); i++) {
-                threadTimer(2000);
+            threadTimer(2000);
 
-                WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
-                        By.xpath("//td[span[contains(text(),'" + labTestNameBundle.get(i) + "')]]/parent::tr")
-                )));
+            WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//td[span[contains(text(),'" + labTestNameBundle.get(data.getIndex()) + "')]]/parent::tr")
+            )));
 
-                row.findElement(By.xpath(".//button[@title='Edit']")).click();
+            row.findElement(By.xpath(".//button[@title='Edit']")).click();
 
-                String headerName = "HeaderHEAD-100155";
-                fillMatOptionField("headerName", headerName);
+            String headerName = data.getHeaderName();
+            fillMatOptionField("headerName", headerName);
 
 
-                selectField("uomId", "TEST-UOM", DropdownType.STANDARD, "");
-                fillTextField("unitPrice", "1000");
-                threadTimer(2000);
-                clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
-                threadTimer(3000);
-            }
+            selectField("uomId", data.getUomId(), DropdownType.STANDARD, "");
+            fillTextField("unitPrice", data.getUnitPrice());
+            threadTimer(2000);
+            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
+            threadTimer(3000);
+
         }
 
     }
