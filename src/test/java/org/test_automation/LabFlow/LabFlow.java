@@ -270,7 +270,9 @@ public class LabFlow extends LoginAndLocationTest {
     public void switchChargeTap(LabTestData data) {
         if (chargesFlow) {
             System.out.println("size:-- and data:--" + labTestNameBundle.toString());
-            menuPanelClick("Master", true, "Charges", "");
+            if (data.getIndex() == 0) {
+                menuPanelClick("Master", true, "Charges", "");
+            }
             clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
             threadTimer(2000);
 
