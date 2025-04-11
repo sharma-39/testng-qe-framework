@@ -1,5 +1,6 @@
 org\test_automation\LabFlow\LabFlow$1.class
 org\test_automation\PharmacyMaster\UOMTestScenario.class
+org\test_automation\DBConnectivity\TableUtils.class
 org\test_automation\SupplierDTO.class
 org\test_automation\PharmacyMaster\ItemCategoryScenario.class
 org\test_automation\SampleCode\FacilityConfiguration.class
@@ -13,6 +14,7 @@ org\test_automation\TapPharmacy\PurchaseFlowToApprove.class
 org\test_automation\TapPharmacy\PurchasePayments.class
 org\test_automation\VO\Patient.class
 org\test_automation\VO\OpBillData.class
+org\test_automation\DBConnectivity\XPathUtil$1.class
 org\test_automation\FlowHelper\PharmacyBillHelper.class
 org\test_automation\PharmacyBill\PharmacyBillFlow.class
 org\test_automation\SupplierDTO$Address.class
@@ -25,6 +27,7 @@ org\test_automation\TestRunner.class
 org\test_automation\PatientTestScanerio\PatientRegisterTestScanerio.class
 org\test_automation\SupplierDTO$Phone.class
 org\test_automation\TapPharmacy\SalesReturn.class
+org\test_automation\VO\LabResult.class
 org\test_automation\VO\Staff.class
 org\test_automation\PharmacyMaster\BrandTestScenario.class
 org\test_automation\PharmacyMaster\ItemTestScenario.class
@@ -32,9 +35,12 @@ org\test_automation\OpBill\OpBillFlow.class
 org\test_automation\VO\Charges.class
 org\test_automation\LoginUtil\ForgetPasswordTest.class
 org\test_automation\PharmacyBill\PharmacyOutOfStockFindPurchase.class
+org\test_automation\DBConnectivity\MenuUtils.class
 org\test_automation\FlowHelper\PatientFlowHelper$1.class
 org\test_automation\DBConnectivity\XPathUtil.class
 org\test_automation\OpBill\CreateSeperateBillOP.class
+org\test_automation\DBConnectivity\DatePickerUtil.class
+org\test_automation\VO\LabTestData.class
 org\test_automation\PharmacyBillConfig\ConfigAgeFormatPharmacyBill.class
 org\test_automation\OpBill\OpBillGenerateFlow.class
 org\test_automation\SupplierDTO$PointOfContact.class
