@@ -5,9 +5,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TableUtils {
-
-
-
+    
     private final DatePickerUtil datePickerUtil=new DatePickerUtil();
 
 
@@ -31,7 +29,7 @@ public class TableUtils {
     }
 
 
-    public void filterSearchElemenet(String searchValue, String searchFiler, String type,WebDriverWait wait, WebDriver driver) {
+    public void filterSearchElement(String searchValue, String searchFiler, String type,WebDriverWait wait, WebDriver driver) {
 
 
         if (type.equals("Text")) {
