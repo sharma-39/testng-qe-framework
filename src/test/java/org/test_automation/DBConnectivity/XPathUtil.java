@@ -263,4 +263,21 @@ public class XPathUtil {
     }
 
 
+
+    public void clickButtonElement(By locator,WebDriver driver,WebDriverWait wait) {
+        //System.out.println("locater" + locator);
+        threadTimer(500);
+        try {
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+
+            if (element.isEnabled()) {
+                element.click();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Normal click failed, using JavaScript click..." + e);
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", driver.findElement(locator));
+        }
+    }
 }

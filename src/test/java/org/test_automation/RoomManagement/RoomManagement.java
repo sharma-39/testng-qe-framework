@@ -39,9 +39,6 @@ public class RoomManagement extends LoginAndLocationTest {
     String roomType;
 
 
-    Random random = new Random();
-    String randomRoomType = roomTypes.get(random.nextInt(roomTypes.size()));
-
     String roomNo;
 
     @Test(priority = 3)
@@ -51,20 +48,17 @@ public class RoomManagement extends LoginAndLocationTest {
 
     @Test(priority = 4)
     public void floorCrud() {
-        clickButtonElement(By.xpath("//a[@id='Floor' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
-
+        navigationTap("Floor");
         floorName = floors.get((int) (Math.random() * roomTypes.size()));
         xPathUtil.fillTextField("floorName", floorName, wait);
-
         String description = "desc";
         xPathUtil.fillTextArea("floorDesc", description, wait, driver);
 
         xPathUtil.formSubmitWithFormId("floorForm", driver, wait, false);
 
-        clickButtonElement(By.xpath("//a[@id='Ward' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+
+        navigationTap("Ward");
 
 
         wardName = wardNames.get((int) (Math.random() * roomTypes.size()));
@@ -79,8 +73,7 @@ public class RoomManagement extends LoginAndLocationTest {
         xPathUtil.formSubmitWithFormId("wardForm", driver, wait, false);
 
 
-        clickButtonElement(By.xpath("//a[@id='Room Type' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+        navigationTap("Room Type");
 
         roomType = roomTypes.get((int) (Math.random() * roomTypes.size()));
         xPathUtil.fillTextField("roomTypeName", roomType, wait);
@@ -95,8 +88,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
         xPathUtil.formSubmitWithFormId("roomTypeForm", driver, wait, false);
 
-        clickButtonElement(By.xpath("//a[@id='Room' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+        navigationTap("Room");
 
         threadTimer(4000);
 
@@ -125,11 +117,11 @@ public class RoomManagement extends LoginAndLocationTest {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("location.reload()");
 
-        clickButtonElement(By.xpath("//a[@id='Bed' and contains(@class, 'nav-link')]"));
-        clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+
+        navigationTap("Bed");
 
 
-        String bedNo = "RM-" + randomThreeDigit;
+        String bedNo = "BD-" + randomThreeDigit;
 
         xPathUtil.fillTextField("bedNo", bedNo, wait);
 
@@ -144,5 +136,10 @@ public class RoomManagement extends LoginAndLocationTest {
         xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
 
 
+    }
+
+    private void navigationTap(String id) {
+        xPathUtil.clickButtonElement(By.xpath("//a[@id='" + id + "' and contains(@class, 'nav-link')]"), driver, wait);
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"), driver, wait);
     }
 }
