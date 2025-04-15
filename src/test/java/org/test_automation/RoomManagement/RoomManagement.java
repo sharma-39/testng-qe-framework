@@ -129,7 +129,7 @@ public class RoomManagement extends LoginAndLocationTest {
         clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
 
 
-        String bedNo = generateRondamNumber("BED-NO");
+        String bedNo = "RM-" + randomThreeDigit;
 
         xPathUtil.fillTextField("bedNo", bedNo, wait);
 
