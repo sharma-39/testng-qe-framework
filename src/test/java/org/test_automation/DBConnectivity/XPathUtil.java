@@ -4,13 +4,10 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.test_automation.BaseTest;
-import org.test_automation.LabFlow.LabFlow;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 
 public class XPathUtil {
@@ -26,7 +23,7 @@ public class XPathUtil {
      * @param driver
      * @param wait
      */
-    public void selectField(String identifier, String value, LabFlow.DropdownType type, String formId, WebDriver driver, WebDriverWait wait) {
+    public void selectField(String identifier, String value, DropdownType type, String formId, WebDriver driver, WebDriverWait wait) {
         try {
             switch (type) {
                 case STANDARD:
@@ -48,9 +45,11 @@ public class XPathUtil {
                 case FORM_ID:
                     handleFormSelect(formId, identifier, value, wait, driver);
                     break;
-
                 case NG_SELECT:
                     ngSelect(identifier, value, driver, wait);
+                case DISPLAY_NONE:
+                    selectDisplayNone(identifier, value, driver, wait);
+                    break;
                 default:
                     throw new IllegalArgumentException("Unsupported dropdown type: " + type);
             }
@@ -59,6 +58,17 @@ public class XPathUtil {
             System.err.println("Failed to select '" + value + "' in " + type + " dropdown: " + e.getMessage());
             throw e;
         }
+    }
+
+    private void selectDisplayNone(String identifier, String value, WebDriver driver, WebDriverWait wait) {
+        String cssSelector =
+                "div[style*='display: block'] select[formcontrolname='" + identifier + "']," + // No space after comma
+                        "div[style*='display: block'] app-select[formcontrolname='" + identifier + "'] select";
+
+        WebElement dropdown = wait.until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector(cssSelector))
+        );
+        new Select(dropdown).selectByVisibleText(value);
     }
 
     private void ngSelect(String identifier, String value, WebDriver driver, WebDriverWait wait) {
@@ -81,13 +91,11 @@ public class XPathUtil {
 
     }
 
-
     private void handleNormalSelect(String identifier, String value, WebDriver driver, WebDriverWait wait) {
 
         System.out.println("identifier::====" + value);
         System.out.println("value::====" + value);
-        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("select[title='" + identifier + "']")));
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("select[title='" + identifier + "']")));
         threadTimer(2000);
 
         new Select(dropdown).selectByVisibleText(value);
@@ -105,22 +113,17 @@ public class XPathUtil {
     }
 
     private void handleStandardSelect(String formControlName, String value, WebDriverWait wait, WebDriver driver) {
-        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("select[formcontrolname='" + formControlName + "'], " +
-                        "app-select[formcontrolname='" + formControlName + "'] select")
-        ));
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("select[formcontrolname='" + formControlName + "'], " + "app-select[formcontrolname='" + formControlName + "'] select")));
+        new Select(dropdown).selectByVisibleText(value);
+    }
+
+    private void handleAngularTitleSelect(String title, String value, WebDriver driver, WebDriverWait wait) {
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("app-select[title='" + title + "'] select")));
+        threadTimer(2000);
         new Select(dropdown).selectByVisibleText(value);
     }
 
     // ================== HANDLER IMPLEMENTATIONS ================== //
-
-    private void handleAngularTitleSelect(String title, String value, WebDriver driver, WebDriverWait wait) {
-        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("app-select[title='" + title + "'] select")
-        ));
-        threadTimer(2000);
-        new Select(dropdown).selectByVisibleText(value);
-    }
 
     public void threadTimer(int threadTime) {
         try {
@@ -132,15 +135,11 @@ public class XPathUtil {
 
     private void handleMaterialSelect(String labelText, String value, WebDriverWait wait, WebDriver driver) {
         // Find and click the mat-select element
-        WebElement matSelect = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//mat-label[contains(.,'" + labelText + "')]/ancestor::mat-form-field//mat-select")
-        ));
+        WebElement matSelect = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//mat-label[contains(.,'" + labelText + "')]/ancestor::mat-form-field//mat-select")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", matSelect);
 
         // Select the option
-        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//mat-option//span[contains(text(),'" + value + "')]")
-        ));
+        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//mat-option//span[contains(text(),'" + value + "')]")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", option);
     }
 
@@ -149,15 +148,9 @@ public class XPathUtil {
         new Select(dropdown).selectByVisibleText(value);
     }
 
-
-    // fill the input field and text format
-
-
     public void fillTextField(String fieldPathId, String value, WebDriverWait wait) {
 
-        WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//input[@formcontrolname='" + fieldPathId + "'] | //app-input-text[@formcontrolname='" + fieldPathId + "']//input | //textarea[@formcontrolname='" + fieldPathId + "'] | app-textarea[@formcontrolname='" + fieldPathId + "']//textarea")
-        ));
+        WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@formcontrolname='" + fieldPathId + "'] | " + "//app-input-text[@formcontrolname='" + fieldPathId + "']//input | " + "//app-input-number[@formcontrolname='" + fieldPathId + "']//input | " + "//textarea[@formcontrolname='" + fieldPathId + "'] " + "| app-textarea[@formcontrolname='" + fieldPathId + "']//textarea")));
         if (inputField.isEnabled()) {
             inputField.clear();
             inputField.sendKeys(value);
@@ -167,12 +160,12 @@ public class XPathUtil {
     }
 
 
+    // fill the input field and text format
+
     //option select
     public void optionSelect(String formControlName, String value, String childValue, WebDriverWait wait, WebDriver driver) {
         try {
-            WebElement radioButton = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//input[@formcontrolname='" + formControlName + "'][@value='" + value + "'] | //label[span[contains(text(), '" + value + "')]]/input[@formcontrolname='" + formControlName + "'] ")
-            ));
+            WebElement radioButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@formcontrolname='" + formControlName + "'][@value='" + value + "'] | //label[span[contains(text(), '" + value + "')]]/input[@formcontrolname='" + formControlName + "'] ")));
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", radioButton);
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", radioButton);
             System.out.println("Selected radio button: " + value);
@@ -180,7 +173,6 @@ public class XPathUtil {
             System.out.println("Radio button with value '" + value + "' not found!");
         }
     }
-
 
     //app text area fill
     public void fillTextArea(String formControlName, String value, WebDriverWait wait, WebDriver driver) {
@@ -191,9 +183,7 @@ public class XPathUtil {
         WebElement textarea = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(cssSelector)));
 
         // Clear existing text using JavaScript (more reliable for Angular fields)
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].value = '';", textarea
-        );
+        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", textarea);
 
         // Send keys and validate input
         textarea.sendKeys(value);
@@ -202,7 +192,6 @@ public class XPathUtil {
 
         threadTimer(500);  // Your existing delay
     }
-
 
     public void closePrintScreen() {
         try {
@@ -215,4 +204,63 @@ public class XPathUtil {
             ignored.printStackTrace();
         }
     }
+
+    public void formSubmitWithFormId(String id, WebDriver driver, WebDriverWait wait, Boolean formIn) {
+        By saveCloseLocator;
+        if (formIn) {
+            saveCloseLocator = By.xpath("//form[@id='" + id + "']//button[contains(@class, 'saveNdClose') and normalize-space()='Save & Close'] | " + "//button[normalize-space()='Save & Close']");
+
+        } else {
+            saveCloseLocator = By.xpath("//div[contains(@style, 'display: block')]" + "//button[normalize-space()='Save & Close']");
+        }
+        try {
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(saveCloseLocator));
+
+            if (element.isEnabled()) {
+                element.click();
+            }
+
+        } catch (TimeoutException | NoSuchElementException e) {
+            System.out.println("error throw" + e.getMessage());
+
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(saveCloseLocator));
+
+            if (element.isEnabled()) {
+                element.click();
+            }
+        }
+
+        threadTimer(2000);
+    }
+
+    public void clickCheckBox(Boolean autoPost, WebDriverWait wait, WebDriver driver, String text) {
+
+        By autoPostCheckbox = By.cssSelector("input[formcontrolname='autoPost']");
+
+// First check existence
+        WebElement checkbox = wait.until(ExpectedConditions.presenceOfElementLocated(autoPostCheckbox));
+
+
+        if (!autoPost) {
+            if (checkbox.isSelected()) {
+                System.out.println("already selected");
+            } else {
+                if (autoPost) {
+                    wait.until(ExpectedConditions.elementToBeClickable(checkbox)).click();
+                }
+            }
+        }
+
+// Then check clickability
+
+    }
+
+    public enum DropdownType {
+        STANDARD,       // HTML <select> with formControlName
+        ANGULAR_TITLE,  // Angular component with title attribute
+        MATERIAL,       // Material-UI <mat-select>
+        XPATH, NORMAL_SELECT, NG_SELECT, FORM_ID, DISPLAY_NONE,// Custom XPath locator
+    }
+
+
 }

@@ -6,7 +6,7 @@
 
     <test name="LoginTests">
         <classes>
-            <class name="org.test_automation.LabFlow.LabFlow"></class>
+            <class name="org.test_automation.RoomManagement.RoomManagement"></class>
         </classes>
     </test>
 </suite>

@@ -26,6 +26,7 @@ import java.util.*;
 
 public class LabFlow extends LoginAndLocationTest {
 
+
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
@@ -33,7 +34,7 @@ public class LabFlow extends LoginAndLocationTest {
     private final Boolean basicPatientToCheckin = true;
     private final Boolean chargesFlow = true;
     private final XPathUtil xPathUtil;
-    private final DatePickerUtil datePickerUtil=new DatePickerUtil();
+    private final DatePickerUtil datePickerUtil = new DatePickerUtil();
     Boolean addCharges = false;
     String labGroupName;
     String specimenName;
@@ -86,7 +87,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.fillTextField("labGroupName", labGroupName, wait);
             threadTimer(1000);
 
-            formSubmitWithFormId("labGroupForm");
+            xPathUtil.formSubmitWithFormId("labGroupForm", driver, wait, true);
 
             threadTimer(2000);
             //create Specimen Details
@@ -109,8 +110,7 @@ public class LabFlow extends LoginAndLocationTest {
                 inputField.sendKeys(specimenName);
             }
 
-            formSubmitWithFormId("specimenGroupForm");
-
+            xPathUtil.formSubmitWithFormId("specimenGroupForm", driver, wait, true);
 
 
             clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
@@ -120,7 +120,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.fillTextField("uomCode", uomCode, wait);
             xPathUtil.fillTextField("uomName", uomName, wait);
 
-            formSubmitWithFormId("chargesForm");
+            xPathUtil.formSubmitWithFormId("chargesForm", driver, wait, true);
 
 
             JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -135,8 +135,8 @@ public class LabFlow extends LoginAndLocationTest {
 
 
             xPathUtil.fillTextField("labTestName", labTestName, wait);
-            xPathUtil.selectField("labGroupId", labGroupName, DropdownType.STANDARD, "", driver, wait);
-            xPathUtil.selectField("labTypeId", data.getLabTypeId(), DropdownType.STANDARD, "", driver, wait);
+            xPathUtil.selectField("labGroupId", labGroupName, XPathUtil.DropdownType.STANDARD, "", driver, wait);
+            xPathUtil.selectField("labTypeId", data.getLabTypeId(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
             xPathUtil.optionSelect("formulary", data.getFormulary(), "", wait, driver);
             xPathUtil.optionSelect("nrtForTheDay", data.getNrtForTheDay(), "", wait, driver);
@@ -170,11 +170,11 @@ public class LabFlow extends LoginAndLocationTest {
                 }
             }
 
-            xPathUtil.selectField("Specimen Type", specimenName, DropdownType.ANGULAR_TITLE, "", driver, wait);
-            xPathUtil.selectField("UOM", uomName, DropdownType.ANGULAR_TITLE, "", driver, wait);
+            xPathUtil.selectField("Specimen Type", specimenName, XPathUtil.DropdownType.ANGULAR_TITLE, "", driver, wait);
+            xPathUtil.selectField("UOM", uomName, XPathUtil.DropdownType.ANGULAR_TITLE, "", driver, wait);
 
 
-            formSubmitWithFormId("labTestForm");
+            xPathUtil.formSubmitWithFormId("labTestForm", driver, wait, true);
             labTestNameBundle.add(labTestName);
 
             if (performanceType.equals("Inhouse")) {
@@ -186,24 +186,24 @@ public class LabFlow extends LoginAndLocationTest {
                 row.findElement(By.xpath(".//button[@title='Add Result']")).click();
 
                 threadTimer(2000);
-                xPathUtil.selectField("sex", data.getSex(), DropdownType.STANDARD, "", driver, wait);
+                xPathUtil.selectField("sex", data.getSex(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
                 fillTheTextFieldInTitle("Age (From)", data.getAgeFrom());
-                xPathUtil.selectField("ageFromUnit", data.getAgeFromUnit(), DropdownType.STANDARD, "", driver, wait);
+                xPathUtil.selectField("ageFromUnit", data.getAgeFromUnit(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
                 fillTheTextFieldInTitle("Age (To)", data.getAgeTo());
-                xPathUtil.selectField("ageToUnit", data.getAgeToUnit(), DropdownType.STANDARD, "", driver, wait);
+                xPathUtil.selectField("ageToUnit", data.getAgeToUnit(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
                 xPathUtil.optionSelect("resultHelpValue", data.getResultHelpValue(), "", wait, driver);
 
                 String labResultTypeId = data.getLabResultTypeId();
 
-                xPathUtil.selectField("labResultTypeId", labResultTypeId, DropdownType.STANDARD, "", driver, wait);
+                xPathUtil.selectField("labResultTypeId", labResultTypeId, XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
                 if (labResultTypeId.equals("Range")) {
                     System.out.println("selected " + labResultTypeId);
                     xPathUtil.fillTextField("low", data.getLabResult().getLow(), wait);
                     xPathUtil.fillTextField("high", data.getLabResult().getHigh(), wait);
-                    xPathUtil.selectField("uomId", uomName, DropdownType.STANDARD, "", driver, wait);
+                    xPathUtil.selectField("uomId", uomName, XPathUtil.DropdownType.STANDARD, "", driver, wait);
                     xPathUtil.fillTextField("criticallyLow", data.getLabResult().getCriticallyLow(), wait);
                     xPathUtil.fillTextField("criticallyHigh", data.getLabResult().getCriticallyHigh(), wait);
                     xPathUtil.fillTextField("defaultValue", data.getLabResult().getDefaultValue(), wait);
@@ -224,21 +224,21 @@ public class LabFlow extends LoginAndLocationTest {
                         }
                     }
                     // Modern type-safe selector
-                    xPathUtil.selectField("Range", data.getLabResult().getRange(), LabFlow.DropdownType.ANGULAR_TITLE, "", driver, wait);
+                    xPathUtil.selectField("Range", data.getLabResult().getRange(), XPathUtil.DropdownType.ANGULAR_TITLE, "", driver, wait);
                     fillTheTextFieldInTitle("Value", data.getLabResult().getResultValue());
 
                     fillTheTextFieldInTitle("Description", data.getLabResult().getDescription());
 
                     //selectWithOutFormNameUsingTitle("UOM", uomName);
 
-                    xPathUtil.selectField("//*[@id='procedureForm']/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName, DropdownType.XPATH, "", driver, wait);
+                    xPathUtil.selectField("//*[@id='procedureForm']/div[2]/div[2]/div[4]/div/span/app-select/div/select", uomName, XPathUtil.DropdownType.XPATH, "", driver, wait);
                 } else if (labResultTypeId.equals("Descriptive")) {
 
                     System.out.println("selected " + labResultTypeId);
 
                     xPathUtil.fillTextArea("valueStr", data.getLabResult().getDescription(), wait, driver);
 
-                    xPathUtil.selectField("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName, DropdownType.XPATH, "", driver, wait);
+                    xPathUtil.selectField("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName, XPathUtil.DropdownType.XPATH, "", driver, wait);
                 } else if (labResultTypeId.equals("Drop-Down")) {
                     System.out.println("selected " + labResultTypeId);
                     WebElement abnormalCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
@@ -252,11 +252,11 @@ public class LabFlow extends LoginAndLocationTest {
                     }
                     fillTheTextFieldInTitle("Options", data.getLabResult().getOptions());
 
-                    xPathUtil.selectField("UOM", uomName, DropdownType.FORM_ID, "procedureForm", driver, wait);
+                    xPathUtil.selectField("UOM", uomName, XPathUtil.DropdownType.FORM_ID, "procedureForm", driver, wait);
                 }
 
 
-                formSubmitWithFormId("procedureForm");
+                xPathUtil.formSubmitWithFormId("procedureForm", driver, wait, true);
 
                 threadTimer(2000);
 
@@ -287,7 +287,7 @@ public class LabFlow extends LoginAndLocationTest {
             fillMatOptionField("headerName", headerName);
 
 
-            xPathUtil.selectField("uomId", data.getUomId(), DropdownType.STANDARD, "", driver, wait);
+            xPathUtil.selectField("uomId", data.getUomId(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
             xPathUtil.fillTextField("unitPrice", data.getUnitPrice(), wait);
             threadTimer(2000);
             clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
@@ -667,16 +667,6 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
 
-    private void formSubmitWithFormId(String id) {
-        By saveCloseLocator = By.xpath("//form[@id='" + id + "']//button[contains(@class, 'saveNdClose') and normalize-space(.)='Save & Close']");
-
-        clickButtonElement(saveCloseLocator);
-
-        threadTimer(2000);
-    }
-
-
-
     //common functionality working
 
     private void selectDropdownOption(String optionText) {
@@ -789,9 +779,6 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
 
-    
-
-
     String generateSequence() {
         String randomPart = "-" + new Random().nextInt(9999);
         return randomPart;
@@ -857,13 +844,4 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
 
-    public enum DropdownType {
-        STANDARD,       // HTML <select> with formControlName
-        ANGULAR_TITLE,  // Angular component with title attribute
-        MATERIAL,       // Material-UI <mat-select>
-        XPATH,
-        NORMAL_SELECT,
-        NG_SELECT,
-        FORM_ID,// Custom XPath locator
-    }
 }

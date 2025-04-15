@@ -17,11 +17,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class BaseTest {
@@ -38,6 +42,15 @@ public class BaseTest {
     protected Boolean isAgeInYear = false;
     protected List<UserDetails> userDetails = new ArrayList<>();
 
+    public enum DropdownType {
+        STANDARD,       // HTML <select> with formControlName
+        ANGULAR_TITLE,  // Angular component with title attribute
+        MATERIAL,       // Material-UI <mat-select>
+        XPATH,
+        NORMAL_SELECT,
+        NG_SELECT,
+        FORM_ID,// Custom XPath locato
+    }
     public Integer billNumber = null;
 
     private static String patientSearchCode = null;
@@ -444,4 +457,23 @@ public class BaseTest {
             ignored.printStackTrace();
         }
     }
+
+   public String generateRondamNumber(String prefix) {
+
+        String datePart = Instant.now()
+                .atZone(ZoneId.systemDefault()) // Convert to system time zone
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd")); // Format date
+
+        int randomPart = 10000 + new Random().nextInt(90000); // Generate a 5-digit random number
+
+        String generateNumber = prefix + "-" + datePart + "-" + randomPart; // Create invoice number
+
+        System.out.println("Generated Number: " + generateNumber);
+        return generateNumber;
+    }
+
+
+
+
+
 }
