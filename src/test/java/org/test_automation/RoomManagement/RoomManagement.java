@@ -10,9 +10,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Test class for Room Management CRUD operations.
+ * Handles creation of floors, wards, room types, rooms, and beds in a sequential manner.
+ */
 public class RoomManagement extends LoginAndLocationTest {
 
     private final XPathUtil xPathUtil = new XPathUtil();
+
+    // Predefined lists for test data
     List<String> roomTypes = Arrays.asList(
             "General Ward", "Private Room", "Semi-Private Room", "ICU (Intensive Care Unit)", "NICU (Neonatal Intensive Care Unit)",
             "PICU (Pediatric Intensive Care Unit)", "Emergency Room", "Operation Theater", "Post-Operative Room", "Recovery Room (PACU)",
@@ -34,110 +40,72 @@ public class RoomManagement extends LoginAndLocationTest {
             "Rehabilitation Floor", "Specialty Floor", "Consultation Floor", "Executive Floor", "Cafeteria Floor", "Parking Basement"
     );
 
-    String floorName;
-    String wardName;
-    String roomType;
-
-
-    String roomNo;
-
+    /**
+     * Opens the Room Management menu.
+     */
     @Test(priority = 3)
     public void menuOpen() {
         menuPanelClick("Master", true, "Room", "");
     }
 
+    /**
+     * Performs CRUD operations for Floor, Ward, Room Type, Room, and Bed entities.
+     * Generates random test data and validates form submissions.
+     */
     @Test(priority = 4)
     public void floorCrud() {
-
+        // Floor Creation
         navigationTap("Floor");
-        floorName = floors.get((int) (Math.random() * roomTypes.size()));
+        String floorName = floors.get(new Random().nextInt(floors.size()));
         xPathUtil.fillTextField("floorName", floorName, wait);
-        String description = "desc";
-        xPathUtil.fillTextArea("floorDesc", description, wait, driver);
-
+        xPathUtil.fillTextArea("floorDesc", "Automation test description", wait, driver);
         xPathUtil.formSubmitWithFormId("floorForm", driver, wait, false);
 
-
+        // Ward Creation
         navigationTap("Ward");
-
-
-        wardName = wardNames.get((int) (Math.random() * roomTypes.size()));
-
+        String wardName = wardNames.get(new Random().nextInt(wardNames.size()));
         xPathUtil.fillTextField("wardName", wardName, wait);
-
         xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.STANDARD, "", driver, wait);
-
-
-        xPathUtil.fillTextArea("wardDesc", "description", wait, driver);
-
+        xPathUtil.fillTextArea("wardDesc", "Automation test description", wait, driver);
         xPathUtil.formSubmitWithFormId("wardForm", driver, wait, false);
 
-
+        // Room Type Creation
         navigationTap("Room Type");
-
-        roomType = roomTypes.get((int) (Math.random() * roomTypes.size()));
+        String roomType = roomTypes.get(new Random().nextInt(roomTypes.size()));
         xPathUtil.fillTextField("roomTypeName", roomType, wait);
-
-        String uomId = "TEST-UOM";
-        String unitPrice = "1000";
-        xPathUtil.selectField("uomId", uomId, XPathUtil.DropdownType.STANDARD, "", driver, wait);
-        xPathUtil.fillTextField("unitPrice", unitPrice, wait);
-
-        Boolean autoPost = false;
-        xPathUtil.clickCheckBox(autoPost, wait, driver, "Auto Post");
-
+        xPathUtil.selectField("uomId", "TEST-UOM", XPathUtil.DropdownType.STANDARD, "", driver, wait);
+        xPathUtil.fillTextField("unitPrice", "1000", wait);
+        xPathUtil.clickCheckBox(false, wait, driver, "Auto Post");
         xPathUtil.formSubmitWithFormId("roomTypeForm", driver, wait, false);
 
+        // Room Creation
         navigationTap("Room");
-
-        threadTimer(4000);
-
-        Random random = new Random();
-        int randomThreeDigit = 100 + random.nextInt(900); // generates number between 100 and 999
-        roomNo = "RM-" + randomThreeDigit;
-
+        threadTimer(4000); // Wait for UI stabilization
+        String roomNo = "RM-" + (100 + new Random().nextInt(900)); // Generates RM-100 to RM-999
         xPathUtil.fillTextField("roomNo", roomNo, wait);
-
-
         xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.STANDARD, "", driver, wait);
-
-        threadTimer(2000);
-        System.out.println("floor name:---" + floorName);
         xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
-
-        threadTimer(2000);
-
         xPathUtil.selectField("wardId", wardName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
-
-        xPathUtil.fillTextArea("roomDesc", "desc", wait, driver);
-
+        xPathUtil.fillTextArea("roomDesc", "Automation test description", wait, driver);
         xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
 
+        // Refresh page to ensure new room is loaded
+        ((JavascriptExecutor) driver).executeScript("location.reload()");
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("location.reload()");
-
-
+        // Bed Creation
         navigationTap("Bed");
-
-
-        String bedNo = "BD-" + randomThreeDigit;
-
+        String bedNo = "BD-" + roomNo.split("-")[1]; // Matches room number
         xPathUtil.fillTextField("bedNo", bedNo, wait);
-
         xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
-
-        threadTimer(2000);
         xPathUtil.selectField("roomId", roomNo, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
-
-
         xPathUtil.optionSelect("usedStatus", "Active", "", wait, driver);
-
-        xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
-
-
+        xPathUtil.formSubmitWithFormId("bedForm", driver, wait, false); // Fixed form ID
     }
 
+    /**
+     * Navigates to a section and clicks the 'Add' button.
+     * @param id The ID of the navigation link to click.
+     */
     private void navigationTap(String id) {
         xPathUtil.clickButtonElement(By.xpath("//a[@id='" + id + "' and contains(@class, 'nav-link')]"), driver, wait);
         xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"), driver, wait);
