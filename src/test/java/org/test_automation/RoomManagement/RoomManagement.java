@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.DBConnectivity.DatePickerUtil;
 import org.test_automation.DBConnectivity.XPathUtil;
@@ -144,7 +145,7 @@ public class RoomManagement extends LoginAndLocationTest {
     @Test(priority = 4)
     public void floorCrud() {
 
-        int index = 1;
+        int index = 2;
         List<String> bedNumbers = new ArrayList<>();
         List<String> roomNumbers = new ArrayList<>();
         int count = 100;
@@ -301,7 +302,7 @@ public class RoomManagement extends LoginAndLocationTest {
         }
     }
 
-    @Test(priority = 4, description = "patiet registeration flow")
+    @Test(priority = 4, description = "patient register flow and create admission flow")
     private void patientFlow() {
         if (basicPatientToCheckin) {
             JSONObject patient = tempPatientData.getJSONObject(8);
@@ -319,7 +320,16 @@ public class RoomManagement extends LoginAndLocationTest {
                 // Create an appointment for the patient
                 isCreateAdmisson = patientFlowHelper.createAdmission(this, patient, driver, wait, "Create Admission", patientCode, bedAllocationFlag, bedAllocation);
 
+                if (isCreateAdmisson) {
+                    menuPanelClick("View Admission", false, "", "");
+                    xPathUtil.clickButtonElement(By.xpath("//a[@id='Allotted' and contains(@class, 'nav-link')]"), driver, wait);
+                    String columnName = wardName;
+                    WebElement row = wait.until(ExpectedConditions.refreshed(
+                            ExpectedConditions.presenceOfElementLocated(By.xpath("//td[span[contains(text(),'" + wardName + "')]]/parent::tr"))
+                    ));
+                    System.out.println("find the ward allocation  row found."+row.getText());
 
+                }
             }
         }
     }
