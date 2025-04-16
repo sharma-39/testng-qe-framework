@@ -151,7 +151,7 @@ public class LabFlow extends LoginAndLocationTest {
 
             xPathUtil.optionSelect("active", data.getActive(), "", wait, driver);
 
-            xPathUtil.fillTextArea("testDescription", data.getTestDescription(), wait, driver);
+            xPathUtil.fillTextArea("testDescription", data.getTestDescription(), wait, driver, "app_text");
 
             String packageOnly = data.getPackageOnly();
             xPathUtil.optionSelect("packageOnly", packageOnly, "", wait, driver);
@@ -236,7 +236,7 @@ public class LabFlow extends LoginAndLocationTest {
 
                     System.out.println("selected " + labResultTypeId);
 
-                    xPathUtil.fillTextArea("valueStr", data.getLabResult().getDescription(), wait, driver);
+                    xPathUtil.fillTextArea("valueStr", data.getLabResult().getDescription(), wait, driver, "app_text");
 
                     xPathUtil.selectField("//*[@id='procedureForm']/div[1]/div[7]/div[3]/app-select/div/select", uomName, XPathUtil.DropdownType.XPATH, "", driver, wait);
                 } else if (labResultTypeId.equals("Drop-Down")) {

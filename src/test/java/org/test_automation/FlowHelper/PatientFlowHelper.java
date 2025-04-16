@@ -6,6 +6,8 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.XPathUtil;
+import org.test_automation.VO.BedAllocation;
 import org.testng.Assert;
 
 import java.time.Duration;
@@ -15,6 +17,7 @@ import java.util.function.Function;
 
 public class PatientFlowHelper {
 
+    private final XPathUtil xPathUtil = new XPathUtil();
 
     public String patientRegisterTest(BaseTest baseTest, JSONObject patient, WebDriver driver, WebDriverWait wait, String panel) {
 
@@ -362,5 +365,104 @@ public class PatientFlowHelper {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    public boolean createAdmission(BaseTest baseTest, JSONObject patient, WebDriver driver, WebDriverWait wait, String panel, String patientCode, Boolean bedAllocationFlag, BedAllocation bedAllocation) {
+        baseTest.menuPanelClick(panel, false, "", "");
+
+        WebElement patientSearchLabel = wait.until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//label[contains(text(), 'Patient Search')]")
+        )));
+        if (patientSearchLabel.getText().contains("Patient Search")) {
+            // System.out.println("Patient Search label found and loaded.");
+            wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+
+            WebElement dropdown1 = driver.findElement(By.xpath("//select[contains(@class, 'form-control')]"));
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+// Set the value directly
+            js.executeScript("arguments[0].value='byCode';", dropdown1);
+
+// Trigger the change event for Angular/React
+            js.executeScript("arguments[0].dispatchEvent(new Event('change'));", dropdown1);
+
+
+            // System.out.println("Custom dropdown option 'By Code' selected.");
+            WebElement patientCodeInput = wait.until(ExpectedConditions.refreshed(
+                    ExpectedConditions.elementToBeClickable(By.name("patientCode"))
+            ));
+
+
+            patientCodeInput.click();
+
+            baseTest.threadTimer(1000);
+
+            patientCodeInput.sendKeys(Keys.BACK_SPACE);
+            baseTest.threadTimer(500);
+            patientCodeInput.sendKeys(patientCode);
+
+
+            List<WebElement> options = wait.until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//mat-option"))));
+
+            boolean found = false;
+            for (WebElement option : options) {
+                if (option.getText().contains(patientCode)) {
+                    option.click();
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.println("Patient name not found in dropdown.");
+            }
+
+            xPathUtil.fillTextField("poa", "new registeration ", wait);
+
+
+            if (bedAllocationFlag) {
+
+                xPathUtil.optionSelect("bedAllocate", "Yes", "", wait, driver);
+
+
+                baseTest.threadTimer(2000);
+                xPathUtil.selectField("roomTypeId", bedAllocation.getRoomType(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+
+                baseTest.threadTimer(2000);
+                xPathUtil.selectField("roomId", bedAllocation.getRoomNo(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+                baseTest.threadTimer(2000);
+
+
+                xPathUtil.selectField("bedId", bedAllocation.getBedNo(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+
+            }
+
+            WebElement selectDoctorId = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.cssSelector("select[formcontrolname='doctorId']")
+            ));
+
+            String doctorName = null;
+            Select selectDr = new Select(selectDoctorId);
+            try {
+                if (doctorName != null) {
+                    selectDr.selectByVisibleText(doctorName);
+                } else {
+                    selectDr.selectByIndex(1);
+                }
+            } catch (Exception e) {
+                selectDr.selectByIndex(1);
+            }
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            baseTest.clickButtonElement(By.xpath("(//button[contains(text(),'Admit')])"));
+        }
+
+
+        return true;
     }
 }

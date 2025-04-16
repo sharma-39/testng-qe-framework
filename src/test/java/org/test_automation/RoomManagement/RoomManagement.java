@@ -1,30 +1,44 @@
 package org.test_automation.RoomManagement;
 
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.DatePickerUtil;
 import org.test_automation.DBConnectivity.XPathUtil;
+import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
+import org.test_automation.VO.BedAllocation;
 import org.testng.annotations.Test;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 
 public class RoomManagement extends LoginAndLocationTest {
 
+
+    private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
+    private static final int patientIncrement = 0; // Counter for patient increment
+    private final PatientFlowHelper patientFlowHelper = new PatientFlowHelper(); // Helper class for patient flow
+    private final Boolean basicPatientToCheckin = true;
+    private final DatePickerUtil datePickerUtil = new DatePickerUtil();
     private final XPathUtil xPathUtil = new XPathUtil();
+    private final boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
     List<String> roomTypes = Arrays.asList(
             "General Ward", "Private Room", "Semi-Private Room", "ICU (Intensive Care Unit)", "NICU (Neonatal Intensive Care Unit)",
             "PICU (Pediatric Intensive Care Unit)", "Emergency Room", "Operation Theater", "Post-Operative Room", "Recovery Room (PACU)",
             "Isolation Room", "Quarantine Room", "Labor Room", "Delivery Room", "Maternity Ward", "Consultation Room", "Examination Room",
             "Procedure Room", "Radiology Room", "Dialysis Room", "Chemotherapy Room", "Burn Unit", "Physiotherapy Room", "Pediatric Ward"
     );
-
     List<String> wardNames = Arrays.asList(
             "General Ward", "Male Ward", "Female Ward", "Pediatric Ward", "Surgical Ward", "Medical Ward", "ICU Ward", "NICU Ward",
             "PICU Ward", "Maternity Ward", "Postnatal Ward", "Antenatal Ward", "Orthopedic Ward", "Cardiology Ward", "Neurology Ward",
             "Oncology Ward", "Burn Ward", "Isolation Ward", "Infectious Disease Ward", "Psychiatric Ward", "Rehabilitation Ward",
             "ENT Ward", "Urology Ward", "Gastroenterology Ward", "High Dependency Unit (HDU)", "Emergency Ward", "Dialysis Ward"
     );
-
     List<String> floors = Arrays.asList(
             "Ground Floor", "First Floor", "Second Floor", "Third Floor", "Basement", "Mezzanine Floor", "Lower Ground Floor",
             "Service Floor", "Emergency Floor", "Operation Theater Floor", "ICU Floor", "Diagnostic Floor", "Maternity Floor",
@@ -84,17 +98,15 @@ public class RoomManagement extends LoginAndLocationTest {
         put("Physiotherapy Room", "Used for physical therapy sessions and rehabilitation.");
         put("Pediatric Ward", "Dedicated to the treatment and care of children.");
     }};
-
-
     Map<String, String> wardDescriptions = new HashMap<>();
-
-
     String floorName;
     String wardName;
     String roomType;
-
-
     String roomNo;
+    String bedNo;
+    BedAllocation bedAllocation = new BedAllocation();
+    private String patientCode; // Stores the patient code
+    private boolean isCreateAdmisson = false; // Flag to check if appointment is created
 
     @Test(priority = 3)
     public void menuOpen() {
@@ -132,95 +144,184 @@ public class RoomManagement extends LoginAndLocationTest {
     @Test(priority = 4)
     public void floorCrud() {
 
-        navigationTap("Floor");
+        int index = 1;
+        List<String> bedNumbers = new ArrayList<>();
+        List<String> roomNumbers = new ArrayList<>();
+        int count = 100;
+        for (int i = 0; i <= roomTypes.size(); i++) {
+            count = 100;
+            bedNumbers.add("Bed-" + count);
+            roomNumbers.add("RM-" + count);
+            count = count + 100;
+        }
 
-        int index=  (int) (Math.random() * roomTypes.size());
-        floorName = floors.get(index);
-        xPathUtil.fillTextField("floorName", floorName, wait);
-        String description = floorDescriptions.get(index);
-        xPathUtil.fillTextArea("floorDesc", description, wait, driver);
-
-        xPathUtil.formSubmitWithFormId("floorForm", driver, wait, false);
-
-
-        navigationTap("Ward");
-
-
-        wardName = wardNames.get((int) (Math.random() * roomTypes.size()));
-
-        xPathUtil.fillTextField("wardName", wardName, wait);
-
-        xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.STANDARD, "", driver, wait);
+        boolean isRoomManagement = true;
+        if (isRoomManagement) {
+            navigationTap("Floor");
 
 
-        xPathUtil.fillTextArea("wardDesc", wardDescriptions.get(wardName), wait, driver);
+            floorName = floors.get(index);
+            xPathUtil.fillTextField("floorName", floorName, wait);
+            String description = floorDescriptions.get(index);
+            xPathUtil.fillTextArea("floorDesc", description, wait, driver, "app_text");
 
-        xPathUtil.formSubmitWithFormId("wardForm", driver, wait, false);
+            xPathUtil.formSubmitWithFormId("floorForm", driver, wait, false);
 
+            successMsg();
 
-        navigationTap("Room Type");
-
-        roomType = roomTypes.get((int) (Math.random() * roomTypes.size()));
-        xPathUtil.fillTextField("roomTypeName", roomType, wait);
-
-        String uomId = "TEST-UOM";
-        String unitPrice = "1000";
-        xPathUtil.selectField("uomId", uomId, XPathUtil.DropdownType.STANDARD, "", driver, wait);
-        xPathUtil.fillTextField("unitPrice", unitPrice, wait);
-
-        Boolean autoPost = false;
-        xPathUtil.clickCheckBox(autoPost, wait, driver, "Auto Post");
-
-        xPathUtil.formSubmitWithFormId("roomTypeForm", driver, wait, false);
-
-        navigationTap("Room");
-
-        threadTimer(4000);
-
-        Random random = new Random();
-        int randomThreeDigit = 100 + random.nextInt(900); // generates number between 100 and 999
-        roomNo = "RM-" + randomThreeDigit;
-
-        xPathUtil.fillTextField("roomNo", roomNo, wait);
+            navigationTap("Ward");
 
 
-        xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.STANDARD, "", driver, wait);
+            wardName = wardNames.get(index);
 
-        threadTimer(2000);
-        System.out.println("floor name:---" + floorName);
-        xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+            xPathUtil.fillTextField("wardName", wardName, wait);
 
-        threadTimer(2000);
-
-        xPathUtil.selectField("wardId", wardName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
-
-        xPathUtil.fillTextArea("roomDesc", roomTypeDescriptions.get(roomType), wait, driver);
-
-        xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+            xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("location.reload()");
+            xPathUtil.fillTextArea("wardDesc", wardDescriptions.get(wardName), wait, driver, "app_text");
+
+            xPathUtil.formSubmitWithFormId("wardForm", driver, wait, false);
 
 
-        navigationTap("Bed");
+            successMsg();
+
+            navigationTap("Room Type");
+
+            roomType = roomTypes.get(index);
+
+            xPathUtil.fillTextField("roomTypeName", roomType, wait);
+
+            String uomId = "TEST-UOM";
+            String unitPrice = "1000";
+            xPathUtil.selectField("uomId", uomId, XPathUtil.DropdownType.STANDARD, "", driver, wait);
+            xPathUtil.fillTextField("unitPrice", unitPrice, wait);
+
+            Boolean autoPost = false;
+            xPathUtil.clickCheckBox(autoPost, wait, driver, "Auto Post");
+
+            xPathUtil.formSubmitWithFormId("roomTypeForm", driver, wait, false);
+
+            successMsg();
+
+            navigationTap("Room");
+
+            threadTimer(4000);
+
+            Random random = new Random();
+            int randomThreeDigit = 100 + random.nextInt(900); // generates number between 100 and 999
+            roomNo = roomNumbers.get(index);
+
+            xPathUtil.fillTextField("roomNo", roomNo, wait);
 
 
-        String bedNo = "BD-" + randomThreeDigit;
+            xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.STANDARD, "", driver, wait);
 
-        xPathUtil.fillTextField("bedNo", bedNo, wait);
+            threadTimer(2000);
+            System.out.println("floor name:---" + floorName);
+            xPathUtil.selectField("floorId", floorName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
 
-        xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+            threadTimer(2000);
 
-        threadTimer(2000);
-        xPathUtil.selectField("roomId", roomNo, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+            xPathUtil.selectField("wardId", wardName, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+
+            xPathUtil.fillTextArea("roomDesc", roomTypeDescriptions.get(roomType), wait, driver, "app_text");
+
+            xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+
+            successMsg();
 
 
-        xPathUtil.optionSelect("usedStatus", "Active", "", wait, driver);
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("location.reload()");
 
-        xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+
+            navigationTap("Bed");
 
 
+            bedNo = bedNumbers.get(index);
+
+            xPathUtil.fillTextField("bedNo", bedNo, wait);
+
+            xPathUtil.selectField("roomTypeId", roomType, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+
+            threadTimer(2000);
+            xPathUtil.selectField("roomId", roomNo, XPathUtil.DropdownType.DISPLAY_NONE, "", driver, wait);
+
+
+            xPathUtil.optionSelect("usedStatus", "Active", "", wait, driver);
+
+            xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+
+            successMsg();
+            bedAllocation = new BedAllocation();
+
+            bedAllocation.setRoomNo(roomNo);
+            bedAllocation.setFloorName(floorName);
+            bedAllocation.setRoomType(roomType);
+            bedAllocation.setWardName(wardName);
+            bedAllocation.setBedNo(bedNo);
+        } else {
+            bedAllocation.setRoomNo(roomNumbers.get(index));
+            bedAllocation.setFloorName(floors.get(index));
+            bedAllocation.setRoomType(roomTypes.get(index));
+            bedAllocation.setWardName(wardName);
+            bedAllocation.setBedNo(bedNo);
+        }
+    }
+
+    private void successMsg() {
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+
+        WebElement resultElement = wait.until(new Function<WebDriver, WebElement>() {
+            @Override
+            public WebElement apply(WebDriver driver) {
+                List<By> locators = Arrays.asList(
+                        By.xpath("//div[contains(@class, 'toast-right-top')]//p[contains(text(), 'Already')]"),
+                        By.xpath("//div[contains(@class, 'toast-right-top')]//p[contains(text(), 'Successfully')]")
+                );
+
+                for (By locator : locators) {
+                    List<WebElement> elements = driver.findElements(locator);
+                    if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+                        return elements.get(0);
+                    }
+                }
+                return null;
+            }
+        });
+        if (resultElement.getText().toLowerCase().contains("success")) {
+
+            System.out.println("Successfully created ");
+        } else {
+
+            xPathUtil.clickButtonElement(By.xpath(" //div[contains(@style, 'display: block')] //button[contains(text(),'Close') and not(contains(text(),'Save'))]"), driver, wait);
+
+        }
+    }
+
+    @Test(priority = 4, description = "patiet registeration flow")
+    private void patientFlow() {
+        if (basicPatientToCheckin) {
+            JSONObject patient = tempPatientData.getJSONObject(8);
+
+            // Register the patient and get the patient code
+            patientCode = patientFlowHelper.patientRegisterTest(this, patient, driver, wait, "Patient Registration");
+            System.out.println("OP Bill flow started for Patient Code: " + patientCode);
+
+            // Navigate to the dashboard
+            menuPanelClick("Dashboard", false, "", "");
+
+            Boolean bedAllocationFlag = true;
+
+            if (patientCode != null) {
+                // Create an appointment for the patient
+                isCreateAdmisson = patientFlowHelper.createAdmission(this, patient, driver, wait, "Create Admission", patientCode, bedAllocationFlag, bedAllocation);
+
+
+            }
+        }
     }
 
     private void navigationTap(String id) {

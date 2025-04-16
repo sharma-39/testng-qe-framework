@@ -114,7 +114,23 @@ public class XPathUtil {
 
     private void handleStandardSelect(String formControlName, String value, WebDriverWait wait, WebDriver driver) {
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("select[formcontrolname='" + formControlName + "'], " + "app-select[formcontrolname='" + formControlName + "'] select")));
-        new Select(dropdown).selectByVisibleText(value);
+
+
+        Select select = new Select(dropdown);
+        List<WebElement> options = select.getOptions();
+
+        boolean isOptionPresent = options.stream()
+                .anyMatch(option -> option.getText().contains(value)); // Use `contains` instead of `equals`
+
+        if (isOptionPresent) {
+            // Select the first option that contains the text
+            select.getOptions().stream()
+                    .filter(option -> option.getText().contains(value))
+                    .findFirst()
+                    .ifPresent(WebElement::click);
+        } else {
+            throw new RuntimeException("No option contains text: " + value);
+        }
     }
 
     private void handleAngularTitleSelect(String title, String value, WebDriver driver, WebDriverWait wait) {
@@ -166,6 +182,7 @@ public class XPathUtil {
     public void optionSelect(String formControlName, String value, String childValue, WebDriverWait wait, WebDriver driver) {
         try {
             WebElement radioButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@formcontrolname='" + formControlName + "'][@value='" + value + "'] | //label[span[contains(text(), '" + value + "')]]/input[@formcontrolname='" + formControlName + "'] ")));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", radioButton);
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", radioButton);
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", radioButton);
             System.out.println("Selected radio button: " + value);
@@ -175,7 +192,7 @@ public class XPathUtil {
     }
 
     //app text area fill
-    public void fillTextArea(String formControlName, String value, WebDriverWait wait, WebDriver driver) {
+    public void fillTextArea(String formControlName, String value, WebDriverWait wait, WebDriver driver, String appText) {
         // Use CSS selector to target the Angular component structure
         String cssSelector = String.format("app-textarea[formcontrolname='%s'] textarea", formControlName);
 
@@ -255,16 +272,7 @@ public class XPathUtil {
 
     }
 
-    public enum DropdownType {
-        STANDARD,       // HTML <select> with formControlName
-        ANGULAR_TITLE,  // Angular component with title attribute
-        MATERIAL,       // Material-UI <mat-select>
-        XPATH, NORMAL_SELECT, NG_SELECT, FORM_ID, DISPLAY_NONE,// Custom XPath locator
-    }
-
-
-
-    public void clickButtonElement(By locator,WebDriver driver,WebDriverWait wait) {
+    public void clickButtonElement(By locator, WebDriver driver, WebDriverWait wait) {
         //System.out.println("locater" + locator);
         threadTimer(500);
         try {
@@ -279,5 +287,13 @@ public class XPathUtil {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", driver.findElement(locator));
         }
+    }
+
+
+    public enum DropdownType {
+        STANDARD,       // HTML <select> with formControlName
+        ANGULAR_TITLE,  // Angular component with title attribute
+        MATERIAL,       // Material-UI <mat-select>
+        XPATH, NORMAL_SELECT, NG_SELECT, FORM_ID, DISPLAY_NONE,// Custom XPath locator
     }
 }
