@@ -61,7 +61,7 @@ public class DatePickerUtil {
             System.out.println("get Days" + day.getText());
             if (day.getText().trim().equals(dateText)) { // Fixing Integer.parseInt issue
                 day.click();
-                System.out.println("Selected Day: " + dateText);
+                // System.out.println("Selected Day: " + dateText);
                 break;
             }
         }
