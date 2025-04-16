@@ -325,9 +325,10 @@ public class RoomManagement extends LoginAndLocationTest {
                     xPathUtil.clickButtonElement(By.xpath("//a[@id='Allotted' and contains(@class, 'nav-link')]"), driver, wait);
                     String columnName = wardName;
                     WebElement row = wait.until(ExpectedConditions.refreshed(
-                            ExpectedConditions.presenceOfElementLocated(By.xpath("//td[span[contains(text(),'" + wardName + "')]]/parent::tr"))
+                            ExpectedConditions.presenceOfElementLocated(By.xpath("//td[span[contains(text(),'" + columnName + "')]]/parent::tr"))
                     ));
                     System.out.println("find the ward allocation  row found."+row.getText());
+
 
                 }
             }
