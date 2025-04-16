@@ -66,6 +66,7 @@ public class DatePickerUtil {
             }
         }
 
+        xPathUtil.threadTimer(200);
 
         System.out.println("Date selection complete.");
         try {
