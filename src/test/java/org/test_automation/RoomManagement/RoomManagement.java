@@ -145,12 +145,12 @@ public class RoomManagement extends LoginAndLocationTest {
     @Test(priority = 4)
     public void floorCrud() {
 
-        int index = 2;
+        int index = 1;
         List<String> bedNumbers = new ArrayList<>();
         List<String> roomNumbers = new ArrayList<>();
-        int count = 100;
+        int count = 200;
         for (int i = 0; i <= roomTypes.size(); i++) {
-            count = 100;
+            count = 800;
             bedNumbers.add("Bed-" + count);
             roomNumbers.add("RM-" + count);
             count = count + 100;
@@ -314,20 +314,49 @@ public class RoomManagement extends LoginAndLocationTest {
             // Navigate to the dashboard
             menuPanelClick("Dashboard", false, "", "");
 
-            Boolean bedAllocationFlag = true;
+            Boolean bedAllocationFlag = false;
 
             if (patientCode != null) {
                 // Create an appointment for the patient
+
                 isCreateAdmisson = patientFlowHelper.createAdmission(this, patient, driver, wait, "Create Admission", patientCode, bedAllocationFlag, bedAllocation);
 
-                if (isCreateAdmisson) {
-                    menuPanelClick("View Admission", false, "", "");
+                menuPanelClick("View Admission", false, "", "");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("location.reload()");
+                if (bedAllocationFlag) {
                     xPathUtil.clickButtonElement(By.xpath("//a[@id='Allotted' and contains(@class, 'nav-link')]"), driver, wait);
                     String columnName = wardName;
                     WebElement row = wait.until(ExpectedConditions.refreshed(
                             ExpectedConditions.presenceOfElementLocated(By.xpath("//td[span[contains(text(),'" + columnName + "')]]/parent::tr"))
                     ));
-                    System.out.println("find the ward allocation  row found."+row.getText());
+                    System.out.println("find the ward allocation  row found." + row.getText());
+                } else {
+                    xPathUtil.clickButtonElement(By.xpath("//a[@id='Unallotted' and contains(@class, 'nav-link')]"), driver, wait);
+
+                    threadTimer(2000);
+                    WebElement row = wait.until(ExpectedConditions.refreshed(
+                            ExpectedConditions.presenceOfElementLocated(By.xpath("//td[span[contains(text(),'" + patientCode + "')]]/parent::tr"))
+                    ));
+
+                    System.out.println("find the row " + row.getText());
+                    WebElement allocated = row.findElement(By.xpath(".//button[@title='Allot']"));
+
+
+                    allocated.click();
+
+                    threadTimer(2000);
+                    xPathUtil.selectField("roomTypeId", bedAllocation.getRoomType(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+
+                    threadTimer(2000);
+                    xPathUtil.selectField("roomId", bedAllocation.getRoomNo(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+                    threadTimer(2000);
+
+
+                    xPathUtil.selectField("bedId", bedAllocation.getBedNo(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
+                    threadTimer(2000);
+
+                    xPathUtil.clickButtonElement(By.xpath("(//button[contains(text(),'Submit')])"), driver, wait);
 
 
                 }
