@@ -65,7 +65,19 @@ public class DatePickerUtil {
                 break;
             }
         }
+
+
         System.out.println("Date selection complete.");
+        try {
+            By applyButtonLocator = By.cssSelector("div.daterangepicker[style*='display: block'] button.applyBtn");
+
+// Retry logic with explicit wait
+            wait.until(ExpectedConditions.refreshed(
+                    ExpectedConditions.elementToBeClickable(applyButtonLocator)
+            )).click();
+        } catch (Exception e) {
+
+        }
         xPathUtil.threadTimer(2000);
     }
 
