@@ -1,12 +1,20 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="AutomationSuite">
+<suite name="AutomationSuite" parallel="false">
     <listeners>
         <listener class-name="org.test_automation.Listener.AllTestListener" />
     </listeners>
 
     <test name="LoginTests">
         <classes>
-            <class name="org.test_automation.RoomManagement.RoomManagement"></class>
+            <class name="org.test_automation.PatientTestScanerio.PatientRegisterTestScanerio"></class>
+
+<!--            pharmacy master scanerio-->
+            <class name="org.test_automation.PharmacyMaster.BrandTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.UOMTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.ItemCategoryScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.ItemTestScenario"></class>
+            <class name="org.test_automation.PharmacyMaster.SuppilerTestScenario"></class>
+
         </classes>
     </test>
 </suite>

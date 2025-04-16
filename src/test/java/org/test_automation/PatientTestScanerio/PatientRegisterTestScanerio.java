@@ -1,5 +1,7 @@
 package org.test_automation.PatientTestScanerio;
 
+import org.asynchttpclient.util.DateUtils;
+import org.test_automation.DBConnectivity.DatePickerUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
@@ -20,8 +22,21 @@ import java.util.*;
 public class PatientRegisterTestScanerio extends LoginAndLocationTest {
 
     static int scenario = 1;
-    private JSONObject patientData;
+    private final DatePickerUtil dateUtils = new DatePickerUtil();
     Map<String, Boolean> mandatoryFieldsMap = new LinkedHashMap<>();
+    private JSONObject patientData;
+
+    public static String generateRandomFirstName(int length) {
+        Random random = new Random();
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        StringBuilder firstName = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            firstName.append(alphabet.charAt(random.nextInt(alphabet.length())));
+        }
+
+        return firstName.toString();
+    }
 
     @DataProvider(name = "patientDataProvider")
     public Object[][] getPatientData() {
@@ -68,7 +83,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 ), true},
                 // Scenario 6: Fill Without Mandatory Fields (Error Highlighting)
                 {createPatientData(
-                        "Mr.", null,
+                        null, null,
                         "M", "Cancel", null, null, null, null,
                         null, null, null, null, null, "emailid@gmail.com", null, null,
                         null, null, null,
@@ -76,7 +91,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 ), false},
                 // Scenario 7: Select "Insurance = Yes" → Fill Insurance Fields
                 {createPatientData(
-                        "Mr.", "Test Name" + generateRandomFirstName(5), "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
+                        null, "Test Name" + generateRandomFirstName(5), "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
                         null, null, "Male", "Married", "77 west street srinivasonnalur kumbakonam",
                         "sharmamurugaiyan@gmail.com", "Tamil Nadu", "Chennai", "F CVT", "fill any diagnonsis", "612204",
                         null, null, null, null, "Indian", "267323633773", "application", "good",
@@ -84,7 +99,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 ), true},
                 // Scenario 8: Select "Insurance = No"
                 {createPatientData(
-                        "Mr.", "Test Name" + generateRandomFirstName(5), "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
+                        null, "Test Name" + generateRandomFirstName(5), "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
                         null, null, "Male", "Married", "77 west street srinivasonnalur kumbakonam",
                         "sharmamurugaiyan@gmail.com", "Tamil Nadu", "Chennai", "F CVT", "fill any diagnonsis", "612204",
                         null, null, null, null, "Indian", "267323633773", "application", "good",
@@ -92,16 +107,16 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 ), true}
                 // Scenario 9: 500 error throw patient registeration
                 , {createPatientData(
-                "Mr.", "Sharma", "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
+                null, "Sharma", "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310502",
                 null, null, "Male", "Married", "77 west street srinivasonnalur kumbakonam",
                 "sharmamurugaiyan@gmail.com", "Tamil Nadu", "Chennai", "F CVT", "fill any diagnonsis", "612204",
                 null, null, null, null, "Indian", "267323633773", "application", "good",
                 "No", null, null, "testing purpose"
-                 ), false}
+        ), false}
 
                 // Scenario 10: email and phone length error validator throw patient registeration
                 , {createPatientData(
-                "Mr.", "Sharma", "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310",
+                null, "Sharma", "M", "D/O", "A +ve", "Intulogic", "05-05-1994", "9791310",
                 null, null, "Male", "Married", "77 west street srinivasonnalur kumbakonam",
                 "sharmamurugaiyan", "Tamil Nadu", "Chennai", "F CVT", "fill any diagnonsis", "612204",
                 null, null, null, null, "Indian", "267323633773", "application", "good",
@@ -162,10 +177,12 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
         }
     }
 
-
     @Test(priority = 4, dataProvider = "patientDataProvider", description = "Patient Registration Test")
     public void patientRegisteration(JSONObject patientData, boolean expectedResult) throws IOException, InterruptedException {
         if (isLoginSuccessful) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("location.reload()");
+
             // Print the scenario description, data, and expected result
             System.out.println("\n=========================================");
             System.out.println("Scenario Description: " + getScenarioDescription(patientData));
@@ -228,7 +245,9 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 reset.click();
             }
 
+
             threadTimer(3000);
+
 
         }
     }
@@ -319,10 +338,9 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
             case "maritalStatus":
             case "insurance":
                 selectRadioButton(fieldName, patientData.getString(fieldName));
-
                 break;
             case "dob":
-                datatePickerDob(patientData.getString(fieldName), "patRegDob12");
+                dateUtils.selectDatePicker(patientData.getString(fieldName), "patRegDob12", wait, driver);
                 break;
             case "state":
                 selectSelectDropdown(fieldName, patientData.getString("state"));
@@ -332,7 +350,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
                 matSelectDropDown(fieldName, patientData.getString(fieldName));
                 break;
             case "expiryDateInsurance":
-                fillExpiryDate(patientData.getString(fieldName));
+                dateUtils.selectDatePicker(patientData.getString(fieldName), "patient-registration2", wait, driver);
                 break;
             default:
                 System.out.println("Unknown field: " + fieldName);
@@ -742,17 +760,5 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
 
             return null;
         });
-    }
-
-    public static String generateRandomFirstName(int length) {
-        Random random = new Random();
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        StringBuilder firstName = new StringBuilder();
-
-        for (int i = 0; i < length; i++) {
-            firstName.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        }
-
-        return firstName.toString();
     }
 }

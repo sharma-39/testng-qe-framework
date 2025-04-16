@@ -30,7 +30,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BaseTest {
 
+    private static final ReentrantLock patientSearchLock = new ReentrantLock();
     protected static WebDriver driver; // Static WebDriver to share across classes
+    private static String patientSearchCode = null;
+    public Integer billNumber = null;
     protected WebDriverWait wait;
     protected boolean isLoginSuccessful = false;
     protected boolean isSingleLocation = false;
@@ -42,19 +45,21 @@ public class BaseTest {
     protected Boolean isAgeInYear = false;
     protected List<UserDetails> userDetails = new ArrayList<>();
 
-    public enum DropdownType {
-        STANDARD,       // HTML <select> with formControlName
-        ANGULAR_TITLE,  // Angular component with title attribute
-        MATERIAL,       // Material-UI <mat-select>
-        XPATH,
-        NORMAL_SELECT,
-        NG_SELECT,
-        FORM_ID,// Custom XPath locato
+    /**
+     * Gets the current patient search code in a thread-safe manner
+     *
+     * @return The current patient search code
+     */
+    public static String getPatientSearchCode() {
+        patientSearchLock.lock();
+        try {
+            System.out.println("[DEBUG] Getting patientSearchCode: " + patientSearchCode +
+                    " (Thread: " + Thread.currentThread().getId() + ")");
+            return patientSearchCode;
+        } finally {
+            patientSearchLock.unlock();
+        }
     }
-    public Integer billNumber = null;
-
-    private static String patientSearchCode = null;
-    private static final ReentrantLock patientSearchLock = new ReentrantLock();
 
     /* ========== Thread-Safe Patient Search Code Methods ========== */
 
@@ -75,17 +80,12 @@ public class BaseTest {
         }
     }
 
-    /**
-     * Gets the current patient search code in a thread-safe manner
-     *
-     * @return The current patient search code
-     */
-    public static String getPatientSearchCode() {
+    public static void clearPatientSearchCode() {
         patientSearchLock.lock();
         try {
-            System.out.println("[DEBUG] Getting patientSearchCode: " + patientSearchCode +
+            System.out.println("[DEBUG] Clearing patientSearchCode" +
                     " (Thread: " + Thread.currentThread().getId() + ")");
-            return patientSearchCode;
+            patientSearchCode = null;
         } finally {
             patientSearchLock.unlock();
         }
@@ -145,7 +145,7 @@ public class BaseTest {
     public void tearDownSuite() {
         // Close the browser after the entire suite
         if (driver != null) {
-            //  driver.quit();
+            driver.quit();
         }
     }
 
@@ -273,12 +273,12 @@ public class BaseTest {
 
     public void filterSearchClick() {
 
-     // Wait until the button is clickable
+        // Wait until the button is clickable
         WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[@title='Search']")
         ));
 
-     // Scroll into view
+        // Scroll into view
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", searchButton);
         try {
             Thread.sleep(500); // Small wait for smooth UI
@@ -324,17 +324,6 @@ public class BaseTest {
             WebElement expiryDateField = driver.findElement(By.id(searchFiler));
             expiryDateField.click();
             selectDatePicker(searchValue);
-        }
-    }
-
-    public static void clearPatientSearchCode() {
-        patientSearchLock.lock();
-        try {
-            System.out.println("[DEBUG] Clearing patientSearchCode" +
-                    " (Thread: " + Thread.currentThread().getId() + ")");
-            patientSearchCode = null;
-        } finally {
-            patientSearchLock.unlock();
         }
     }
 
@@ -392,12 +381,10 @@ public class BaseTest {
         System.out.println("Date selection complete.");
     }
 
-
     public String convertMMToMonth(String monthNumber) {
         int monthInt = Integer.parseInt(monthNumber);
         return Month.of(monthInt).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
     }
-
 
     public void selectDatePicker(String dateValue, String formFieldId) {
 
@@ -458,7 +445,7 @@ public class BaseTest {
         }
     }
 
-   public String generateRondamNumber(String prefix) {
+    public String generateRondamNumber(String prefix) {
 
         String datePart = Instant.now()
                 .atZone(ZoneId.systemDefault()) // Convert to system time zone
@@ -472,8 +459,15 @@ public class BaseTest {
         return generateNumber;
     }
 
-
-
+    public enum DropdownType {
+        STANDARD,       // HTML <select> with formControlName
+        ANGULAR_TITLE,  // Angular component with title attribute
+        MATERIAL,       // Material-UI <mat-select>
+        XPATH,
+        NORMAL_SELECT,
+        NG_SELECT,
+        FORM_ID,// Custom XPath locato
+    }
 
 
 }
