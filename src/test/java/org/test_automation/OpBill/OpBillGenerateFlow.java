@@ -1,5 +1,7 @@
 package org.test_automation.OpBill;
 
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.json.JSONObject;
@@ -9,8 +11,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -19,11 +19,13 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
 
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static int patientIncrement = 0; // Counter for patient increment
-    private PatientFlowHelper patientFlowHelper; // Helper class for patient flow
+    private final XPathUtil xPathUtil = new XPathUtil();
+    private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
     private String patientCode; // Stores the patient code
     private boolean isAppointmentCreated = false; // Flag to check if appointment is created
     private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
 
+    private  final MenuUtils menuUtils=new MenuUtils();
     // Constructor to initialize the PatientFlowHelper
     public OpBillGenerateFlow() {
         this.patientFlowHelper = new PatientFlowHelper();
@@ -45,7 +47,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
             System.out.println("OP Bill flow started for Patient Code: " + patientCode);
 
             // Navigate to the dashboard
-            menuPanelClick("Dashboard", false, "", "");
+            menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
             if (patientCode != null) {
                 // Create an appointment for the patient
@@ -58,7 +60,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
 
                     if (isAppointmentCheckedIn) {
                         // Navigate to the OP menu
-                        menuPanelClick("OP", false, "", "");
+                        menuUtils.menuPanelClick("OP", false, "", "",driver,wait);
 
                         // Define billing statuses
                         List<String> status = Arrays.asList("Partially Paid", "Paid");
@@ -222,7 +224,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
         threadTimer(3000); // Wait for the UI to update
         clickElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]")); // Confirm payment
         threadTimer(5000); // Wait for the payment to process
-        closePrintScreen(); // Close the print screen
+        xPathUtil.closePrintScreen(); // Close the print screen
     }
 
     // Helper method to click an element
@@ -265,7 +267,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
             if (!isFound) {
                 try {
                     currentPage++; // Increment before clicking
-                    System.out.println("click index of page number"+currentPage);
+                    System.out.println("click index of page number" + currentPage);
                     WebElement pageNo = wait.until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//ul[contains(@class, 'ngx-pagination')]//li/a/span[text()='" + currentPage + "']")
                     ));
@@ -328,8 +330,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
     }
 
 
-    private void searchButtonClick()
-    {
+    private void searchButtonClick() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 // Wait until the button is clickable
@@ -350,8 +351,7 @@ public class OpBillGenerateFlow extends LoginAndLocationTest {
     }
 
 
-    private void  searchFieldPatientCode(String patientCode)
-    {
+    private void searchFieldPatientCode(String patientCode) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 // Wait for the input field inside the "Patient Code" column

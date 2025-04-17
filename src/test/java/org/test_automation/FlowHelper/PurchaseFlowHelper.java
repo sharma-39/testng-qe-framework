@@ -7,7 +7,10 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 
+import javax.xml.xpath.XPath;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.Month;
@@ -20,11 +23,13 @@ import java.util.Random;
 
 public class PurchaseFlowHelper {
 
+    private final MenuUtils menuUtils=new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
     public void addStockPurchase(BaseTest baseTest, List<String> items, WebDriver driver, WebDriverWait wait, String pharmacy, JsonNode stockData, String type) {
 
-        baseTest.menuPanelClick("Stock", true, "Purchase", "");
+        menuUtils.menuPanelClick("Stock", true, "Purchase", "",driver,wait);
         //add stock
-        baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add Stock')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add Stock')]"),driver,wait);
 
         JsonNode supplier = stockData.get("stock").get("supplier");
         selectDropdownByVisibleText(By.xpath("//select[@formcontrolname='supplierId']"),
@@ -44,28 +49,28 @@ public class PurchaseFlowHelper {
                 stockData.get("stock").get("tcs").asText(), true, wait);
 
 
-        baseTest.clickButtonElement(By.xpath("//div[contains(@class, 'addIcon-button')]"));
+        xPathUtil.clickButtonElement(By.xpath("//div[contains(@class, 'addIcon-button')]"),driver,wait);
         if (items.size() == 0 ) {
             for (int i = 0; i < stockData.get("stock").get("items").size(); i++) {
 
                 addStockDetails(stockData.get("stock").get("items").get(i), wait, baseTest, driver, "auto", null);
-                baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"));
+                xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"),driver,wait);
 
             }
         } else {
             for (int i = 0; i < items.size(); i++) {
                 addStockDetails(stockData.get("stock").get("items").get(i), wait, baseTest, driver, "custom", items.get(i).trim());
-                baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"));
+                xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"),driver,wait);
             }
         }
 
         WebElement modal = driver.findElement(By.cssSelector(".modal-content"));
         if (modal.isDisplayed()) {
 
-            baseTest.clickButtonElement(By.xpath("//button[contains(text(), 'Close') and not(contains(text(), 'Save'))]"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Close') and not(contains(text(), 'Save'))]"),driver,wait);
             System.out.println("Added items: ");
             baseTest.threadTimer(500);
-            baseTest.clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("(//button[contains(text(),'Save & Close')])"),driver,wait);
             System.out.println("Modal is open.");
         } else {
             System.out.println("Modal is closed.");

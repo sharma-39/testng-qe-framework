@@ -8,6 +8,8 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.FlowHelper.PurchaseFlowHelper;
 import org.test_automation.FlowHelper.ReturnHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
@@ -22,11 +24,11 @@ import java.util.ArrayList;
 
 public class PurchaseReturn extends LoginAndLocationTest {
 
-    String purchaseSupplierName = null;
-
     private final ReturnHelper returnHelper;
-
+    private final MenuUtils menuUtils = new MenuUtils();
+    private final XPathUtil xPathUtil = new XPathUtil();
     private final PurchaseFlowHelper purchaseFlowHelper;
+    String purchaseSupplierName = null;
 
     public PurchaseReturn() {
         this.purchaseFlowHelper = new PurchaseFlowHelper();
@@ -37,7 +39,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
     public void menuClick() {
 
         if (isLoginSuccessful) {
-            menuPanelClick("Master", true, "Pharmacy", "");
+            menuUtils.menuPanelClick("Master", true, "Pharmacy", "", driver, wait);
         }
     }
 
@@ -141,7 +143,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
     @Test(priority = 5, dependsOnMethods = "menuClick")
     public void addPurchasePayments() {
         threadTimer(3000);
-        menuPanelClick("Purchase Payments", false, "", "");
+        menuUtils.menuPanelClick("Purchase Payments", false, "", "", driver, wait);
 
         filterSearchClick();
 
@@ -182,7 +184,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
 // Clear and enter value
         amountInput.sendKeys(balanceValue); // Enter your desired amount
 
-        clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"), driver, wait);
 
 
     }
@@ -213,7 +215,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
     @Test(priority = 7)
     public void purchaseReturnPaid() {
         threadTimer(3000);
-        menuPanelClick("Returns", true, "Purchase Returns", "");
+        menuUtils.menuPanelClick("Returns", true, "Purchase Returns", "", driver, wait);
         threadTimer(3000);
         WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//td[span[contains(text(),'" + purchaseSupplierName + "')]]/parent::tr")
@@ -239,7 +241,7 @@ public class PurchaseReturn extends LoginAndLocationTest {
 // Select by visible text (e.g., "Cash")
         paymentType.selectByVisibleText("Cash");
 
-        clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"), driver, wait);
 
     }
 

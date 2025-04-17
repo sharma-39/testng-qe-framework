@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.DBConnectivity.DatePickerUtil;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
@@ -21,6 +22,7 @@ import java.util.function.Function;
 public class RoomManagement extends LoginAndLocationTest {
 
 
+    private final MenuUtils menuUtils=new MenuUtils();
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper = new PatientFlowHelper(); // Helper class for patient flow
@@ -111,7 +113,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
     @Test(priority = 3)
     public void menuOpen() {
-        menuPanelClick("Master", true, "Room", "");
+        menuUtils.menuPanelClick("Master", true, "Room", "",driver,wait);
         wardDescriptions.put("General Ward", "A shared room for general medical or surgical care with multiple beds.");
         wardDescriptions.put("Male Ward", "A general ward specifically designated for male patients.");
         wardDescriptions.put("Female Ward", "A general ward specifically designated for female patients.");
@@ -312,7 +314,7 @@ public class RoomManagement extends LoginAndLocationTest {
             System.out.println("OP Bill flow started for Patient Code: " + patientCode);
 
             // Navigate to the dashboard
-            menuPanelClick("Dashboard", false, "", "");
+            menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
             Boolean bedAllocationFlag = false;
 
@@ -321,7 +323,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
                 isCreateAdmisson = patientFlowHelper.createAdmission(this, patient, driver, wait, "Create Admission", patientCode, bedAllocationFlag, bedAllocation);
 
-                menuPanelClick("View Admission", false, "", "");
+                menuUtils.menuPanelClick("View Admission", false, "", "",driver,wait);
                 JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript("location.reload()");
                 if (bedAllocationFlag) {

@@ -6,6 +6,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.VO.BedAllocation;
 import org.testng.Assert;
@@ -19,6 +20,8 @@ public class PatientFlowHelper {
 
     private final XPathUtil xPathUtil = new XPathUtil();
 
+    private final MenuUtils menuUtils=new MenuUtils();
+
     public String patientRegisterTest(BaseTest baseTest, JSONObject patient, WebDriver driver, WebDriverWait wait, String panel) {
 
         String name = patient.getString("patientName");
@@ -26,7 +29,7 @@ public class PatientFlowHelper {
         String phone = patient.getString("patientPhone");
         String gender = patient.getString("gender");
         String patientCode;
-        baseTest.menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
         try {
 
             patientFormSubmit(driver, wait);
@@ -192,7 +195,7 @@ public class PatientFlowHelper {
         String admissionType = patient.getString("admissionType");
         String doctorName = patient.getString("doctorName");
         String scanType = patient.getString("scanType");
-        baseTest.menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
 
         WebElement patientSearchLabel = wait.until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//label[contains(text(), 'Patient Search')]")
@@ -354,7 +357,7 @@ public class PatientFlowHelper {
     public boolean checkingAppointmentTest(BaseTest baseTest, WebDriver driver, WebDriverWait wait, String panel, String patientCode) {
 
         try {
-            baseTest.menuPanelClick(panel, false, "", "");
+            menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
             WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//td[span[contains(text(),'" + patientCode + "')]]/parent::tr")
             )));
@@ -368,7 +371,7 @@ public class PatientFlowHelper {
     }
 
     public boolean createAdmission(BaseTest baseTest, JSONObject patient, WebDriver driver, WebDriverWait wait, String panel, String patientCode, Boolean bedAllocationFlag, BedAllocation bedAllocation) {
-        baseTest.menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
 
         WebElement patientSearchLabel = wait.until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//label[contains(text(), 'Patient Search')]")
@@ -459,7 +462,7 @@ public class PatientFlowHelper {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            baseTest.clickButtonElement(By.xpath("(//button[contains(text(),'Admit')])"));
+            xPathUtil.clickButtonElement(By.xpath("(//button[contains(text(),'Admit')])"),driver,wait);
         }
 
 

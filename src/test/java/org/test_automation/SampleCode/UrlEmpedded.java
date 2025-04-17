@@ -1,5 +1,6 @@
 package org.test_automation.SampleCode;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -14,12 +15,13 @@ import java.util.List;
 
 public class UrlEmpedded extends LoginAndLocationTest {
 
+    private final MenuUtils menuUtils=new MenuUtils();
 
     @Test(priority = 3, dependsOnMethods = {"testLogin"})
     public void OpenPharmacyClickPrint()
     {
         if(isLoginSuccessful) {
-            menuPanelClick("Pharmacy", false, "", "");
+            menuUtils.menuPanelClick("Pharmacy", false, "", "",driver,wait);
 
             List<String> containTest = new ArrayList<>();
             containTest.add("Dr.David T");

@@ -6,10 +6,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.BaseTest;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.SupplierDTO;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -18,14 +18,17 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class ReturnHelper {
+    private final MenuUtils menuUtils = new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
+
     public void createSalesReturnBill(BaseTest baseTest, WebDriver driver, WebDriverWait wait, String parentPanel, String childPanel, String billNumber) {
 
 
         System.out.println("pharmacy bills----");
 
-        baseTest.menuPanelClick(parentPanel, true, childPanel, "");
+        menuUtils.menuPanelClick(parentPanel, true, childPanel, "", driver, wait);
 
-        baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add Return')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add Return')]"),driver,wait);
 
 
         baseTest.threadTimer(1500);
@@ -80,22 +83,10 @@ public class ReturnHelper {
 
 
         }
-        baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Return')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Return')]"),driver,wait);
 
 
-        Robot robot = null;
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        baseTest.threadTimer(2000); // Wait for print dialog
-
-        // Press ESC to cancel print
-        robot.keyPress(KeyEvent.VK_ESCAPE);
-        robot.keyRelease(KeyEvent.VK_ESCAPE);
+        xPathUtil.closePrintScreen();
     }
 
 
@@ -127,7 +118,7 @@ public class ReturnHelper {
 
     //create supplier
     public String addSupplier(BaseTest baseTest, SupplierDTO data, WebDriverWait wait, WebDriver driver) {
-        baseTest.verifyPanelName("Pharmacy Master");
+        menuUtils.verifyPanelName("Pharmacy Master", wait);
         System.out.println("Successfully loaded Pharmacy Master");
 
         clickElement(By.xpath("//a[@id='Supplier' and contains(@class, 'nav-link')]"), wait);
@@ -253,9 +244,9 @@ public class ReturnHelper {
 
     public void createPurchaseReturnBill(BaseTest baseTest, WebDriver driver, WebDriverWait wait, String parentPanel, String childPanel, String supplierName, JsonNode jsonNode) {
 
-        baseTest.menuPanelClick(parentPanel, true, childPanel, "");
+        menuUtils.menuPanelClick(parentPanel, true, childPanel, "", driver, wait);
 
-        baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add Return')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add Return')]"),driver,wait);
 
 
         baseTest.threadTimer(1500);
@@ -288,7 +279,7 @@ public class ReturnHelper {
             if (name == null || name.isEmpty()) {
                 throw new IllegalArgumentException("Item name is required");
             }
-            baseTest.clickButtonElement(By.xpath(".//button[@title='Add New']"));
+            xPathUtil.clickButtonElement(By.xpath(".//button[@title='Add New']"),driver,wait);
             selectAutoCompleteItem(By.xpath("//input[@formcontrolname='itemName']"),
                     name,
                     desc, true, baseTest, wait, driver, "auto");
@@ -305,7 +296,7 @@ public class ReturnHelper {
 
             } else {
                 System.out.println("Already paid this item and return ");
-                baseTest.clickButtonElement(By.xpath("//button[contains(text(), 'Close') and not(contains(text(), 'Save'))]"));
+                xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Close') and not(contains(text(), 'Save'))]"),driver,wait);
             }
 
         }

@@ -3,16 +3,20 @@ package org.test_automation.TapPharmacy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.testng.annotations.Test;
 
 public class PurchasePayments extends LoginAndLocationTest {
 
+    private final MenuUtils menuUtils=new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
 
     @Test(priority = 3)
     public void menuClick() {
         if (isLoginSuccessful) {
-            menuPanelClick("Purchase Payments", false, "", "");
+            menuUtils.menuPanelClick("Purchase Payments", false, "", "",driver,wait);
         }
     }
 
@@ -58,7 +62,7 @@ public class PurchasePayments extends LoginAndLocationTest {
         amountInput.clear();
         amountInput.sendKeys(balanceValue); // Enter your desired amount (0-8862)
 
-        clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Pay')]"),driver,wait);
 
 
     }

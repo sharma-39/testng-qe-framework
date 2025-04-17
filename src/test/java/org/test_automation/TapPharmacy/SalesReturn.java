@@ -3,6 +3,7 @@ package org.test_automation.TapPharmacy;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.FlowHelper.ReturnHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.testng.annotations.Test;
@@ -10,11 +11,11 @@ import org.testng.annotations.Test;
 public class SalesReturn extends LoginAndLocationTest {
 
     private final ReturnHelper returnHelper;
+    private final MenuUtils menuUtils = new MenuUtils();
 
     public SalesReturn() {
         this.returnHelper = new ReturnHelper();
     }
-
 
     @Test(priority = 3, dependsOnMethods = {"testLogin"})
     public void billGenerate() {
@@ -25,7 +26,7 @@ public class SalesReturn extends LoginAndLocationTest {
             String patientCode = getPatientSearchCode();
 
 
-            menuPanelClick("Pharmacy", false, "", "");
+            menuUtils.menuPanelClick("Pharmacy", false, "", "", driver, wait);
             String billNo = findBillNumber(patientCode);
             if (billNo != null) {
                 returnHelper.createSalesReturnBill(this, driver, wait, "Returns", "Sales Returns", billNo);

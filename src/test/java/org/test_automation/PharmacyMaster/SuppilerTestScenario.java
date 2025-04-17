@@ -3,6 +3,7 @@ package org.test_automation.PharmacyMaster;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.Listener.AllTestListener;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
@@ -28,6 +29,7 @@ import java.util.Random;
 @Listeners(AllTestListener.class)
 public class SuppilerTestScenario extends LoginAndLocationTest {
 
+    private final MenuUtils menuUtils=new MenuUtils();
     private final static HashMap<String, String> treeMap = new HashMap<>();
 
     @DataProvider(name = "supplierDataProvider")
@@ -156,7 +158,7 @@ public class SuppilerTestScenario extends LoginAndLocationTest {
     @Test(priority = 3)
     public void testMenuOpen() {
         if (isLoginSuccessful) {
-            menuPanelClick("Master", true, "Pharmacy", "");
+            menuUtils.menuPanelClick("Master", true, "Pharmacy", "",driver,wait);
         }
     }
 
@@ -199,7 +201,7 @@ public class SuppilerTestScenario extends LoginAndLocationTest {
 
     // Helper method to add a supplier
     public String addSupplier(JsonNode supplierData) {
-        verifyPanelName("Pharmacy Master");
+        menuUtils.verifyPanelName("Pharmacy Master",wait);
         clickElement(By.xpath("//a[@id='Supplier' and contains(@class, 'nav-link')]"));
         clickElement(By.xpath("//button[contains(text(),'Add New')]"));
 

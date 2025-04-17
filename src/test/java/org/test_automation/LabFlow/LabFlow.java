@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.test_automation.DBConnectivity.DatePickerUtil;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
@@ -27,6 +28,7 @@ import java.util.*;
 public class LabFlow extends LoginAndLocationTest {
 
 
+    private final MenuUtils menuUtils=new MenuUtils();
     private static final long THREAD_SECONDS = 3000; // Constant for thread sleep time
     private static final int patientIncrement = 0; // Counter for patient increment
     private final PatientFlowHelper patientFlowHelper; // Helper class for patient flow
@@ -65,7 +67,7 @@ public class LabFlow extends LoginAndLocationTest {
     public void labMasterCreate(LabTestData data) {
 
         if (basicLabFlow) {
-            menuPanelClick("Master", true, "Lab", "");
+            menuUtils.menuPanelClick("Master", true, "Lab", "",driver,wait);
 
             labGroupName = data.getLabGroupName() + generateSequence(); // object
 
@@ -77,8 +79,8 @@ public class LabFlow extends LoginAndLocationTest {
             labTestName = data.getLabTestName() + generateSequence();
 
             threadTimer(2000);
-            clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Test Group' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
 
             //create TestGroup
@@ -91,9 +93,9 @@ public class LabFlow extends LoginAndLocationTest {
 
             threadTimer(2000);
             //create Specimen Details
-            clickButtonElement(By.xpath("//a[@id='Specimen Details' and contains(@class, 'nav-link')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Specimen Details' and contains(@class, 'nav-link')]"),driver,wait);
 
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
 
             threadTimer(1000);
@@ -113,8 +115,8 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.formSubmitWithFormId("specimenGroupForm", driver, wait, true);
 
 
-            clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
 
             xPathUtil.fillTextField("uomCode", uomCode, wait);
@@ -128,10 +130,10 @@ public class LabFlow extends LoginAndLocationTest {
             threadTimer(2000);
             //lab text nav form
 
-            clickButtonElement(By.xpath("//a[@id='Lab Test' and contains(@class, 'nav-link')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Lab Test' and contains(@class, 'nav-link')]"),driver,wait);
 
 
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
 
             xPathUtil.fillTextField("labTestName", labTestName, wait);
@@ -272,9 +274,9 @@ public class LabFlow extends LoginAndLocationTest {
         if (chargesFlow) {
             System.out.println("size:-- and data:--" + labTestNameBundle.toString());
             if (data.getIndex() == 0) {
-                menuPanelClick("Master", true, "Charges", "");
+                menuUtils.menuPanelClick("Master", true, "Charges", "",driver,wait);
             }
-            clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"),driver,wait);
             threadTimer(2000);
 
             WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
@@ -290,7 +292,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.selectField("uomId", data.getUomId(), XPathUtil.DropdownType.STANDARD, "", driver, wait);
             xPathUtil.fillTextField("unitPrice", data.getUnitPrice(), wait);
             threadTimer(2000);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"),driver,wait);
             threadTimer(3000);
 
         }
@@ -300,7 +302,7 @@ public class LabFlow extends LoginAndLocationTest {
     @Test(priority = 6, description = "Enable auto patient code ")
     public void enableAutoGeneratedPatientCode() {
         threadTimer(2000);
-        menuPanelClick("General", false, "", "");
+        menuUtils.menuPanelClick("General", false, "", "",driver,wait);
         threadTimer(2000);
         // Wait for checkbox to be clickable (10-second timeout)
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -338,7 +340,7 @@ public class LabFlow extends LoginAndLocationTest {
             System.out.println("OP Bill flow started for Patient Code: " + patientCode);
 
             // Navigate to the dashboard
-            menuPanelClick("Dashboard", false, "", "");
+            menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
             if (patientCode != null) {
                 // Create an appointment for the patient
@@ -364,7 +366,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     private void labTestResult() {
-        menuPanelClick("View Lab", false, "", "");
+        menuUtils.menuPanelClick("View Lab", false, "", "",driver,wait);
 
         filterSearchClick();
         filterSearchElemenet(patientCode, "Patient Code", "Text");
@@ -422,7 +424,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     private void paidFlow() {
-        menuPanelClick("Lab", false, "", "");
+        menuUtils.menuPanelClick("Lab", false, "", "",driver,wait);
 
         threadTimer(3000); // Wait for the page to load
         int discount = 50;
@@ -447,12 +449,12 @@ public class LabFlow extends LoginAndLocationTest {
 
     // Helper method to submit billing
     private void submitBilling() {
-        clickButtonElement(By.xpath("//label[contains(text(), 'Remarks')]")); // Click remarks
-        clickButtonElement(By.xpath("//button[contains(text(), 'Pay Bill')]")); // Click pay bill
+        xPathUtil.clickButtonElement(By.xpath("//label[contains(text(), 'Remarks')]"),driver,wait); // Click remarks
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Pay Bill')]"),driver,wait); // Click pay bill
         threadTimer(3000); // Wait for the UI to update
-        clickButtonElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]")); // Confirm payment
+        xPathUtil.clickButtonElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]"),driver,wait); // Confirm payment
         threadTimer(5000); // Wait for the payment to process
-        closePrintScreen(); // Close the print screen
+        xPathUtil.closePrintScreen(); // Close the print screen
     }
 
 
@@ -580,7 +582,7 @@ public class LabFlow extends LoginAndLocationTest {
     }
 
     private void labFlow() {
-        menuPanelClick("Current Admissions", false, "", "");
+        menuUtils.menuPanelClick("Current Admissions", false, "", "",driver,wait);
 
         WebElement patientRow = findAndClickDropdownAndPrescription(patientCode, wait, driver, "Lab");
 

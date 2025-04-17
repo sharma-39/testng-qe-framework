@@ -1,5 +1,6 @@
 package org.test_automation.PharmacyMaster;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.Listener.AllTestListener;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
@@ -25,6 +26,7 @@ public class BrandTestScenario extends LoginAndLocationTest {
 
     static int incresescenario = 0;
     String editBrandCode;
+    private final MenuUtils menuUtils=new MenuUtils();
 
     // Helper method to generate a random number with a prefix
     private String generateRandomNumber(String prefix) {
@@ -126,7 +128,7 @@ public class BrandTestScenario extends LoginAndLocationTest {
     @Test(priority = 3)
     public void openMenu() {
         if (isLoginSuccessful) {
-            menuPanelClick("Master", true, "Pharmacy", "");
+            menuUtils.menuPanelClick("Master", true, "Pharmacy", "",driver,wait);
         }
     }
 

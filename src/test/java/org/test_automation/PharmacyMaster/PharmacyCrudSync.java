@@ -2,6 +2,7 @@ package org.test_automation.PharmacyMaster;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -27,6 +28,8 @@ public class PharmacyCrudSync extends LoginAndLocationTest {
 
 
     private final static HashMap<String, String> treeMap = new HashMap<>();
+
+    private  final MenuUtils menuUtils=new MenuUtils();
 
     @DataProvider(name = "supplierData")
     public Object[][] getSupplierData() throws IOException {
@@ -66,7 +69,7 @@ public class PharmacyCrudSync extends LoginAndLocationTest {
     @Test(priority = 3)
     public void menuClick() {
         if (isLoginSuccessful) {
-            menuPanelClick("Master", true, "Pharmacy", "");
+            menuUtils.menuPanelClick("Master", true, "Pharmacy", "",driver,wait);
         }
     }
 
@@ -325,7 +328,7 @@ public class PharmacyCrudSync extends LoginAndLocationTest {
 
 
     public String addSupplier(JsonNode supplierData) {
-        verifyPanelName("Pharmacy Master");
+        menuUtils.verifyPanelName("Pharmacy Master",wait);
         System.out.println("Successfully loaded Pharmacy Master");
 
         clickElement(By.xpath("//a[@id='Supplier' and contains(@class, 'nav-link')]"));

@@ -2,6 +2,7 @@ package org.test_automation.PatientTestScanerio;
 
 import org.asynchttpclient.util.DateUtils;
 import org.test_automation.DBConnectivity.DatePickerUtil;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
@@ -25,6 +26,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
     private final DatePickerUtil dateUtils = new DatePickerUtil();
     Map<String, Boolean> mandatoryFieldsMap = new LinkedHashMap<>();
     private JSONObject patientData;
+    private  final MenuUtils menuUtils =new MenuUtils();
 
     public static String generateRandomFirstName(int length) {
         Random random = new Random();
@@ -173,7 +175,7 @@ public class PatientRegisterTestScanerio extends LoginAndLocationTest {
     @Test(priority = 3, dependsOnMethods = {"testLogin"})
     public void runOpenMenu() {
         if (isLoginSuccessful) {
-            menuPanelClick("Patient Registration", false, "", "");
+            menuUtils.menuPanelClick("Patient Registration", false, "", "",driver,wait);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.test_automation.PharmacyBillConfig;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.DBConnectivity.DBUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
@@ -28,6 +29,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
     static String labelTextAge = null;
     protected String patientCode;
 
+    private final MenuUtils menuUtils=new MenuUtils();
     private PatientFlowHelper patientHelper;
 
     protected boolean isAppoinmentCreated = false;
@@ -57,7 +59,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
                     namePatientAndAge(ageLabel.get(j));
                     patientCode = patientHelper.patientRegisterTest(this, patient, driver, wait, "Patient Registration");
                     logSummary.append("✅ Patient Registered: ").append(patientCode).append(" | ");
-                    menuPanelClick("Dashboard", false, "", "");
+                    menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
                     threadTimer(3000);
                     if (patientCode != null) {
                         isAppoinmentCreated = patientHelper.createAppointment(this, patient, driver, wait, "Create Appointment", patientCode);
@@ -80,7 +82,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
                                 else {
                                     break;
                                 }
-                                menuPanelClick("Dashboard", false, "", "");
+                                menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
                             } else {
                                 logSummary.append("❌ Appointment Check in Issue");
                             }
@@ -111,7 +113,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
         patientLabelCaption = null;
         JSONObject patient = tempPatientData.getJSONObject(patientIncrement);
         if (isLoginSuccessful) {
-            menuPanelClick("Facility Configurations", false, "", "");
+            menuUtils.menuPanelClick("Facility Configurations", false, "", "",driver,wait);
             threadTimer(5000);
 
             WebElement ageFormatElement = driver.findElement(By.xpath("//h2[contains(text(), 'Age Format In Bill')]"));
@@ -191,7 +193,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
     }
 
     private void addPrescription(String name, String panel, String prescriptionSearch, String prescriptionSelect) {
-        menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
         try {
             threadTimer(3000);
 
@@ -301,7 +303,7 @@ public class ConfigAgeFormatPharmacyBill extends LoginAndLocationTest {
     }
 
     private void pharmacyBill(String name, String panel) {
-        menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 

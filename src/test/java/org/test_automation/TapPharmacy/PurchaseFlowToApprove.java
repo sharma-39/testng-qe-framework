@@ -2,6 +2,7 @@ package org.test_automation.TapPharmacy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -25,6 +26,7 @@ import java.util.Random;
 
 public class PurchaseFlowToApprove extends LoginAndLocationTest {
 
+    private final MenuUtils menuUtils=new MenuUtils();
     @DataProvider(name = "stockData")
     public Object[][] getStockData() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,9 +40,9 @@ public class PurchaseFlowToApprove extends LoginAndLocationTest {
         boolean backdrop=false;
         while(!backdrop) {
             boolean afterApprovelEdit = false;
-            menuPanelClick("Stock", true, "Purchase", "");
+            menuUtils.menuPanelClick("Stock", true, "Purchase", "",driver,wait);
             waitForSeconds(3);
-            verifyPanelName("Purchase Management");
+            menuUtils.verifyPanelName("Purchase Management",wait);
             String invoiceNumber = addStock(stockData);
             System.out.println("STOCK Created Successfully :-Invoice number " + invoiceNumber);
 
@@ -49,9 +51,9 @@ public class PurchaseFlowToApprove extends LoginAndLocationTest {
             System.out.println("STOCK Edit Successfully :-Invoice number " + invoiceNumber);
             backdropOccur();
 
-            menuPanelClick("Approval", true, "Purchase Edit Approval", "");
+            menuUtils.menuPanelClick("Approval", true, "Purchase Edit Approval", "",driver,wait);
 
-            verifyPanelName("Purchase Edit Approval");
+            menuUtils.verifyPanelName("Purchase Edit Approval",wait);
 
             if (afterApprovelEdit) {
                 editStock(invoiceNumber, stockData);
@@ -69,8 +71,8 @@ public class PurchaseFlowToApprove extends LoginAndLocationTest {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("location.reload()");
             threadTimer(3000);
-            menuPanelClick("Dashboard", false, "", "");
-            verifyPanelName("Dashboard");
+            menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
+            menuUtils.verifyPanelName("Dashboard",wait);
 
         } else {
             System.out.println("No modal backdrop detected, proceeding with test...");

@@ -79,7 +79,7 @@ public class MenuUtils {
             WebElement breadcrumb = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//li[@class='breadcrumb-item active breadcrums-data' and normalize-space()='" + expectedText + "']")
             ));
-            System.out.println("Breadcrumb found: " + breadcrumb.getText());
+            System.out.println("Text found:-" + breadcrumb.getText());
             if (breadcrumb.getText().contains(expectedText)) {
                 return true;
             }

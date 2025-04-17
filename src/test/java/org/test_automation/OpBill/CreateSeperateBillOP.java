@@ -1,5 +1,7 @@
 package org.test_automation.OpBill;
 
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -14,13 +16,15 @@ import java.util.List;
 
 public class CreateSeperateBillOP extends LoginAndLocationTest {
 
+    private final MenuUtils menuUtils=new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
     @Test(priority = 3, description = "Test to create a new bill for a patient")
     public void createBill() {
         // Check if login was successful
         if (isLoginSuccessful) {
 
             // Navigate to the OP menu
-            menuPanelClick("OP", false, "", "");
+            menuUtils.menuPanelClick("OP", false, "", "",driver,wait);
             By opBillsLocator = By.xpath("//li[contains(@class, 'breadcrumb-item') and contains(text(), 'OP Bills')]");
 
             while (driver.findElements(opBillsLocator).isEmpty()) {
@@ -55,14 +59,14 @@ public class CreateSeperateBillOP extends LoginAndLocationTest {
 
                 // Submit billing and close the print screen
                 submitBilling();
-                closePrintScreen();
+                xPathUtil.closePrintScreen();
 
                 // Get pagination details and search for the patient code and status
                 int totalPages = getPaginationDetails();
                 if (findRowPatientCodeAndStatus("SWI-2-910-P-2025", "View Bill", "Partially Paid".toUpperCase(), totalPages)) {
                     threadTimer(3000);
                     submitBilling();
-                    closePrintScreen();
+                    xPathUtil.closePrintScreen();
                 }
             } else {
                 System.out.println("Patient Search label not found.");
@@ -232,7 +236,7 @@ public class CreateSeperateBillOP extends LoginAndLocationTest {
         threadTimer(3000);
         clickElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]"));
         threadTimer(5000);
-        closePrintScreen();
+        xPathUtil.closePrintScreen();
     }
 
 

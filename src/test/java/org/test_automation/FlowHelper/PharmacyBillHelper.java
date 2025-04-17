@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -14,11 +16,14 @@ import java.util.List;
 public class PharmacyBillHelper {
 
 
+    private final MenuUtils menuUtils=new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
+
+
     public void addCustomBill(String patientCode, BaseTest baseTest, WebDriver driver) {
 
-        baseTest.clickButtonElement(By.xpath("//button[contains(text(),'Add Bill')]"));
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+        WebDriverWait wait=new WebDriverWait(driver,Duration.ofMillis(50));
+        xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add Bill')]"),driver,wait);
 
         WebElement dropdown1 = driver.findElement(By.xpath("//select[contains(@class, 'form-control')]"));
 
@@ -67,7 +72,7 @@ public class PharmacyBillHelper {
     public String addPharmacyBill(BaseTest baseTest, String patientCode, WebDriver driver, WebDriverWait wait, String panel) {
 
         System.out.println("Patient Code:---" + patientCode);
-        baseTest.menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
 
 
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
@@ -173,7 +178,7 @@ public class PharmacyBillHelper {
     }
 
     public void addPrescriptionPharmacyBill(BaseTest baseTest, String patientCode, WebDriver driver, WebDriverWait wait, String panel, String screenCheck) {
-        baseTest.menuPanelClick(panel, false, "", screenCheck);
+       menuUtils.menuPanelClick(panel, false, "", screenCheck,driver,wait);
         try {
             if (screenCheck.isEmpty()) {
                 WebElement patientRow = findAndClickDropdownAndPrescription(patientCode, wait, driver);
@@ -189,7 +194,7 @@ public class PharmacyBillHelper {
                 }
             }
 
-            addBillItems(baseTest, wait);
+            addBillItems(baseTest, wait,driver);
             WebElement quantityInput = wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//input[@type='number' and @title='Quantity']")
             ));
@@ -213,10 +218,10 @@ public class PharmacyBillHelper {
 
     }
 
-    private void addBillItems(BaseTest baseTest, WebDriverWait wait) {
+    private void addBillItems(BaseTest baseTest, WebDriverWait wait, WebDriver driver) {
 
         try {
-            baseTest.clickButtonElement(By.xpath(".//button[@title='Add New']"));
+           xPathUtil.clickButtonElement(By.xpath(".//button[@title='Add New']"),driver,wait);
 
             WebElement itemInput = wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//input[@class='mat-autocomplete-trigger form-control ng-pristine ng-valid ng-star-inserted ng-touched' and @role='combobox']")
@@ -310,7 +315,7 @@ public class PharmacyBillHelper {
 
 
     public Boolean addPrescriptionCurrentAdmission(BaseTest baseTest, String patientCode, WebDriver driver, WebDriverWait wait, String panel, JSONObject patient) {
-        baseTest.menuPanelClick(panel, false, "", "");
+        menuUtils.menuPanelClick(panel, false, "", "",driver,wait);
         String prescriptionSearch = patient.getString("prescriptionSearch");
         String prescriptionSelect = patient.getString("prescriptionSelect");
         try {

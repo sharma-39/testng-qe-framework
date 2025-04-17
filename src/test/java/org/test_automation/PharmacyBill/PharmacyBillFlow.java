@@ -1,5 +1,6 @@
 package org.test_automation.PharmacyBill;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.FlowHelper.PharmacyBillHelper;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
@@ -20,6 +21,7 @@ public class PharmacyBillFlow extends LoginAndLocationTest {
     private boolean isAppointmentCreated = false; // Flag to check if appointment is created
     private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
 
+    private final MenuUtils menuUtils=new MenuUtils();
     private Boolean isPrescriptionAdd = false;
 
     public PharmacyBillFlow() {
@@ -39,7 +41,7 @@ public class PharmacyBillFlow extends LoginAndLocationTest {
                 System.out.println("OP Bill flow started for Patient Code: " + patientCode);
 
                 // Navigate to the dashboard
-                menuPanelClick("Dashboard", false, "", "");
+                menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
                 if (patientCode != null) {
                     // Create an appointment for the patient

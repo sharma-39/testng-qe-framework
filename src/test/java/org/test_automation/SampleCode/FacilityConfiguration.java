@@ -1,5 +1,6 @@
 package org.test_automation.SampleCode;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -12,12 +13,13 @@ import java.util.List;
 public class FacilityConfiguration extends LoginAndLocationTest {
 
 
+    private  final MenuUtils menuUtils=new MenuUtils();
 
     @Test(priority = 3, dependsOnMethods = {"testLogin"})
     public void FacilityConfigurateAgeInMonthEnable()
     {
         if(isLoginSuccessful) {
-            menuPanelClick("Facility Configurations", false, "", "");
+            menuUtils.menuPanelClick("Facility Configurations", false, "", "",driver,wait);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

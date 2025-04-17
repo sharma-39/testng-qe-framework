@@ -1,5 +1,6 @@
 package org.test_automation.PharmacyBill;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.FlowHelper.PatientFlowHelper;
 import org.test_automation.FlowHelper.PharmacyBillHelper;
 import org.test_automation.FlowHelper.PurchaseFlowHelper;
@@ -23,6 +24,7 @@ public class PharmacyOutOfStockFindPurchase extends LoginAndLocationTest {
     private boolean isAppointmentCreated = false; // Flag to check if appointment is created
     private boolean isAppointmentCheckedIn = false; // Flag to check if appointment is checked in
     private boolean isPrescriptionAdd = false;
+    private final MenuUtils menuUtils=new MenuUtils();
 
     public PharmacyOutOfStockFindPurchase() {
         this.patientFlowHelper = new PatientFlowHelper();
@@ -43,7 +45,7 @@ public class PharmacyOutOfStockFindPurchase extends LoginAndLocationTest {
                 System.out.println("OP Bill flow started for Patient Code: " + patientCode);
 
                 // Navigate to the dashboard
-                menuPanelClick("Dashboard", false, "", "");
+                menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
                 setPatientSearchCode(patientCode);
                 if (patientCode != null) {

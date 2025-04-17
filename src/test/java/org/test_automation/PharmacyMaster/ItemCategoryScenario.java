@@ -1,5 +1,6 @@
 package org.test_automation.PharmacyMaster;
 
+import org.test_automation.DBConnectivity.MenuUtils;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -22,6 +23,7 @@ public class ItemCategoryScenario extends LoginAndLocationTest {
 
     private Map<String, String> treeMap = new HashMap<>();
 
+    private  final MenuUtils menuUtils=new MenuUtils();
     // Helper method to generate a random number with a prefix
     private String generateRandomNumber(String prefix) {
         String datePart = Instant.now()
@@ -137,7 +139,7 @@ public class ItemCategoryScenario extends LoginAndLocationTest {
     @Test(priority = 3)
     public void openMenu() {
         if (isLoginSuccessful) {
-            menuPanelClick("Master", true, "Pharmacy", "");
+            menuUtils.menuPanelClick("Master", true, "Pharmacy", "",driver,wait);
         }
     }
 

@@ -7,6 +7,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.test_automation.VO.Charges;
 import org.test_automation.VO.OpBillData;
@@ -14,13 +16,9 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Month;
-import java.time.format.TextStyle;
 import java.util.*;
 import java.util.List;
 
@@ -34,9 +32,11 @@ public class OpBillFlow extends LoginAndLocationTest {
     Boolean continueFlag = true;
     String doctorName = null;
 
-    Integer chargeSize = 0;
     String chargesName;
 
+    private final XPathUtil xPathUtil=new XPathUtil();
+
+    private final MenuUtils menuUtils=new MenuUtils();
 
     @DataProvider(name = "opBillData")
     public Object[][] getTestData() throws IOException {
@@ -56,14 +56,14 @@ public class OpBillFlow extends LoginAndLocationTest {
     @Test(priority = 4, description = "testLogin")
     public void createInsurenceProvider() {
         if (insurenceProvider == null) {
-            menuPanelClick("Master", true, "Insurance", "");
-            clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"));
+            menuUtils.menuPanelClick("Master", true, "Insurance", "",driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add New')]"),driver,wait);
 
             insurenceProvider = testData.getInsuranceProvider().getNameBase() + generateSequence();
             fillInputField("insuranceProvider", insurenceProvider);
             fillInputField("insuranceProviderCode", testData.getInsuranceProvider().getCodeBase() + generateSequence());
 
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
         }
 
     }
@@ -72,7 +72,7 @@ public class OpBillFlow extends LoginAndLocationTest {
     public void patientRegisteration() {
         Random random = new Random();
         if (patientCode == null) {
-            menuPanelClick("Patient Registration", false, "", "");
+            menuUtils.menuPanelClick("Patient Registration", false, "", "",driver,wait);
             threadTimer(3000);
             //fill the patient code,FirstName, lastName,Dob,phonenumber,Gender,State,City mantatory fields,and insurence details
 
@@ -117,7 +117,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
 
         if (doctorName == null) {
-            menuPanelClick("Staff", true, "Staff Registration", "");
+            menuUtils.menuPanelClick("Staff", true, "Staff Registration", "",driver,wait);
             threadTimer(2000);
 
             fillInputField("peopleCode", testData.getStaff().getStaffCode());
@@ -145,7 +145,7 @@ public class OpBillFlow extends LoginAndLocationTest {
             submitButton.click();
 
             doctorName = firstName + " " + lastName;
-            menuPanelClick("Dashboard", false, "", "");
+            menuUtils.menuPanelClick("Dashboard", false, "", "",driver,wait);
 
 
         }
@@ -156,7 +156,7 @@ public class OpBillFlow extends LoginAndLocationTest {
     @Test(priority = 8)
     public void createAppointment() {
         if (continueFlag) {
-            menuPanelClick("Create Appointment", false, "", "");
+            menuUtils.menuPanelClick("Create Appointment", false, "", "",driver,wait);
 
             threadTimer(2000);
 
@@ -238,7 +238,7 @@ public class OpBillFlow extends LoginAndLocationTest {
 
                 selectDropDown(doctorName, "doctorId");
 
-                clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+                xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
             }
         }
 
@@ -249,7 +249,7 @@ public class OpBillFlow extends LoginAndLocationTest {
     public void checkInAppointment() {
         if (continueFlag) {
             try {
-                menuPanelClick("View Appointments", false, "", "");
+                menuUtils.menuPanelClick("View Appointments", false, "", "",driver,wait);
                 WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                         By.xpath("//td[span[contains(text(),'" + patientCode + "')]]/parent::tr")
                 )));
@@ -270,47 +270,47 @@ public class OpBillFlow extends LoginAndLocationTest {
             Charges chargesData = testData.getCharges();
 
             // Create Header Type
-            menuPanelClick("Master", true, "Charges", "");
+            menuUtils.menuPanelClick("Master", true, "Charges", "",driver,wait);
             threadTimer(2000);
-            clickButtonElement(By.xpath("//a[@id='Header Type' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Header Type' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
             headerType = chargesData.getHeaderTypeBase() + generateSequence();
             fillInputField("headerTypeName", headerType);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
 
             // Create Header Group
-            clickButtonElement(By.xpath("//a[@id='Header Group' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Header Group' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
             String headerGroup = chargesData.getHeaderGroupBase() + generateSequence();
             fillInputField("headerGroupName", headerGroup);
             selectField("headerTypeId", headerType);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
 
             // Create Header
-            clickButtonElement(By.xpath("//a[@id='Header' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Header' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
             String headerName = chargesData.getHeaderNameBase() + generateSequence();
             fillInputField("headerName", headerName);
             selectField("headerGroupId", headerGroup);
             selectField("headerTypeId", headerType);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
 
             // Create UOM
-            clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
             String uomCode = chargesData.getUomCodeBase() + generateSequence();
             String uomName = chargesData.getUomNameBase() + generateSequence();
             fillInputField("uomCode", uomCode);
             fillInputField("uomName", uomName);
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')])"),driver,wait);
 
             // Create Charges
-            clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"));
-            clickButtonElement(By.xpath("//button[contains(text(),'Add')]"));
+            xPathUtil.clickButtonElement(By.xpath("//a[@id='Charges' and contains(@class, 'nav-link')]"),driver,wait);
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Add')]"),driver,wait);
 
             fillMatOptionField("headerName", headerName);
             selectField("itemType", chargesData.getItemType());
@@ -326,13 +326,13 @@ public class OpBillFlow extends LoginAndLocationTest {
             );
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", checkbox);
 
-            clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"));
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(),'Save & Close')]"),driver,wait);
         }
     }
 
     @Test(priority = 11)
     public void createOpBill() {
-        menuPanelClick("OP", false, "", "");
+        menuUtils.menuPanelClick("OP", false, "", "",driver,wait);
 
         WebElement row = wait.until(ExpectedConditions.refreshed(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//td[span[contains(text(),'" + patientCode + "')]]/parent::tr")
@@ -378,13 +378,13 @@ public class OpBillFlow extends LoginAndLocationTest {
             table.click();
 
 
-            clickButtonElement(By.xpath("//label[contains(text(), 'Remarks')]")); // Click remarks
-            clickButtonElement(By.xpath("//button[contains(text(), 'Pay Bill')]")); // Click pay bill
+            xPathUtil.clickButtonElement(By.xpath("//label[contains(text(), 'Remarks')]"),driver,wait); // Click remarks
+            xPathUtil.clickButtonElement(By.xpath("//button[contains(text(), 'Pay Bill')]"),driver,wait); // Click pay bill
             threadTimer(3000); // Wait for the UI to update
-            clickButtonElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]")); // Confirm payment
+            xPathUtil.clickButtonElement(By.xpath("//div[contains(@class, 'sa-confirm-button-container')]//button[contains(text(), 'Yes')]"),driver,wait); // Confirm payment
             threadTimer(5000);
 
-            closePrintScreen();
+            xPathUtil.closePrintScreen();
 
         }
 
