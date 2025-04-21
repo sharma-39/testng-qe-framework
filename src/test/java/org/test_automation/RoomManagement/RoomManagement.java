@@ -168,7 +168,7 @@ public class RoomManagement extends LoginAndLocationTest {
             String description = floorDescriptions.get(index);
             xPathUtil.fillTextArea("floorDesc", description, wait, driver, "app_text");
 
-            xPathUtil.formSubmitWithFormId("floorForm", driver, wait, false);
+            xPathUtil.commonSaveAndClose("floorForm", driver, wait, false, By.id(""));
 
             successMsg();
 
@@ -184,7 +184,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
             xPathUtil.fillTextArea("wardDesc", wardDescriptions.get(wardName), wait, driver, "app_text");
 
-            xPathUtil.formSubmitWithFormId("wardForm", driver, wait, false);
+            xPathUtil.commonSaveAndClose("wardForm", driver, wait, false, By.id(""));
 
 
             successMsg();
@@ -203,7 +203,7 @@ public class RoomManagement extends LoginAndLocationTest {
             Boolean autoPost = false;
             xPathUtil.clickCheckBox(autoPost, wait, driver, "Auto Post");
 
-            xPathUtil.formSubmitWithFormId("roomTypeForm", driver, wait, false);
+            xPathUtil.commonSaveAndClose("roomTypeForm", driver, wait, false, By.id(""));
 
             successMsg();
 
@@ -230,7 +230,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
             xPathUtil.fillTextArea("roomDesc", roomTypeDescriptions.get(roomType), wait, driver, "app_text");
 
-            xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+            xPathUtil.commonSaveAndClose("roomForm", driver, wait, false, By.id(""));
 
             successMsg();
 
@@ -254,7 +254,7 @@ public class RoomManagement extends LoginAndLocationTest {
 
             xPathUtil.optionSelect("usedStatus", "Active", "", wait, driver);
 
-            xPathUtil.formSubmitWithFormId("roomForm", driver, wait, false);
+            xPathUtil.commonSaveAndClose("roomForm", driver, wait, false, By.id(""));
 
             successMsg();
             bedAllocation = new BedAllocation();

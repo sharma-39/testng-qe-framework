@@ -203,11 +203,7 @@ public class PharmacyBillHelper {
             quantityInput.sendKeys("10");
 
 
-            WebElement saveCloseButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//button[contains(text(), 'Save & Close')]")
-            ));
-
-            saveCloseButton.click();
+            xPathUtil.commonSaveAndClose("",driver,wait,false,By.xpath("//button[contains(text(), 'Save & Close')]"));
 
             System.out.println("Successfully created Prescription");
 

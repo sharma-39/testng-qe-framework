@@ -4,10 +4,12 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 public class XPathUtil {
@@ -222,13 +224,18 @@ public class XPathUtil {
         }
     }
 
-    public void formSubmitWithFormId(String id, WebDriver driver, WebDriverWait wait, Boolean formIn) {
-        By saveCloseLocator;
-        if (formIn) {
-            saveCloseLocator = By.xpath("//form[@id='" + id + "']//button[contains(@class, 'saveNdClose') and normalize-space()='Save & Close'] | " + "//button[normalize-space()='Save & Close']");
+    public void commonSaveAndClose(String id, WebDriver driver, WebDriverWait wait, Boolean formIn, By commonLocator) {
 
+        By saveCloseLocator;
+        if (id.isEmpty()) {
+            if (formIn) {
+                saveCloseLocator = By.xpath("//form[@id='" + id + "']//button[contains(@class, 'saveNdClose') and normalize-space()='Save & Close'] | " + "//button[normalize-space()='Save & Close']");
+
+            } else {
+                saveCloseLocator = By.xpath("//div[contains(@style, 'display: block')]" + "//button[normalize-space()='Save & Close']");
+            }
         } else {
-            saveCloseLocator = By.xpath("//div[contains(@style, 'display: block')]" + "//button[normalize-space()='Save & Close']");
+            saveCloseLocator = commonLocator;
         }
         try {
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(saveCloseLocator));
@@ -247,7 +254,49 @@ public class XPathUtil {
             }
         }
 
+        errorMessageAndResponseMessage(wait);
+
         threadTimer(2000);
+    }
+
+    private String errorMessageAndResponseMessage(WebDriverWait wait) {
+        return wait.until(driver -> {
+            // Error messages (only these should cause test failure)
+            List<String> errorMessages = Arrays.asList(
+                    "Error 403",
+                    "Error 0",
+                    "Error 2",
+                    "Something Went Wrong",
+                    "Internal"
+            );
+
+            // XPath locators for detecting messages
+            List<By> messageLocators = Arrays.asList(
+                    By.xpath("//div[contains(@class, 'container-2')]/p"),
+                    By.xpath("//p"),
+                    By.xpath("//div[contains(@class, 'toast-right-top')]//p")
+            );
+
+            // Iterate through locators to find a message
+            for (By locator : messageLocators) {
+                List<WebElement> elements = driver.findElements(locator);
+                if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+                    String messageText = elements.get(0).getText().trim();
+                    System.out.println("🔍 Message Found: " + messageText);
+
+                    // Fail only if message is in errorMessages list
+                    if (errorMessages.contains(messageText)) {
+                        System.out.println("⚠️ Error Message Detected: " + messageText);
+                        Assert.fail("Test failed due to error message: " + messageText);
+                    }
+
+                    // ✅ Return the found message text
+                    return messageText;
+                }
+            }
+
+            return null;
+        });
     }
 
     public void clickCheckBox(Boolean autoPost, WebDriverWait wait, WebDriver driver, String text) {

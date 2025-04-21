@@ -6,14 +6,7 @@
 
     <test name="LoginTests">
         <classes>
-            <class name="org.test_automation.PatientTestScanerio.PatientRegisterTestScanerio"></class>
-
-<!--            pharmacy master scanerio-->
             <class name="org.test_automation.PharmacyMaster.BrandTestScenario"></class>
-            <class name="org.test_automation.PharmacyMaster.UOMTestScenario"></class>
-            <class name="org.test_automation.PharmacyMaster.ItemCategoryScenario"></class>
-            <class name="org.test_automation.PharmacyMaster.ItemTestScenario"></class>
-            <class name="org.test_automation.PharmacyMaster.SuppilerTestScenario"></class>
 
         </classes>
     </test>

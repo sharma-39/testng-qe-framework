@@ -89,7 +89,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.fillTextField("labGroupName", labGroupName, wait);
             threadTimer(1000);
 
-            xPathUtil.formSubmitWithFormId("labGroupForm", driver, wait, true);
+            xPathUtil.commonSaveAndClose("labGroupForm", driver, wait, true, By.id(""));
 
             threadTimer(2000);
             //create Specimen Details
@@ -112,7 +112,7 @@ public class LabFlow extends LoginAndLocationTest {
                 inputField.sendKeys(specimenName);
             }
 
-            xPathUtil.formSubmitWithFormId("specimenGroupForm", driver, wait, true);
+            xPathUtil.commonSaveAndClose("specimenGroupForm", driver, wait, true, By.id(""));
 
 
             xPathUtil.clickButtonElement(By.xpath("//a[@id='UOM' and contains(@class, 'nav-link')]"),driver,wait);
@@ -122,7 +122,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.fillTextField("uomCode", uomCode, wait);
             xPathUtil.fillTextField("uomName", uomName, wait);
 
-            xPathUtil.formSubmitWithFormId("chargesForm", driver, wait, true);
+            xPathUtil.commonSaveAndClose("chargesForm", driver, wait, true, By.id(""));
 
 
             JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -176,7 +176,7 @@ public class LabFlow extends LoginAndLocationTest {
             xPathUtil.selectField("UOM", uomName, XPathUtil.DropdownType.ANGULAR_TITLE, "", driver, wait);
 
 
-            xPathUtil.formSubmitWithFormId("labTestForm", driver, wait, true);
+            xPathUtil.commonSaveAndClose("labTestForm", driver, wait, true, By.id(""));
             labTestNameBundle.add(labTestName);
 
             if (performanceType.equals("Inhouse")) {
@@ -258,7 +258,7 @@ public class LabFlow extends LoginAndLocationTest {
                 }
 
 
-                xPathUtil.formSubmitWithFormId("procedureForm", driver, wait, true);
+                xPathUtil.commonSaveAndClose("procedureForm", driver, wait, true, By.id(""));
 
                 threadTimer(2000);
 
@@ -272,7 +272,6 @@ public class LabFlow extends LoginAndLocationTest {
     @Test(priority = 5, dataProvider = "labTestData")
     public void switchChargeTap(LabTestData data) {
         if (chargesFlow) {
-            System.out.println("size:-- and data:--" + labTestNameBundle.toString());
             if (data.getIndex() == 0) {
                 menuUtils.menuPanelClick("Master", true, "Charges", "",driver,wait);
             }

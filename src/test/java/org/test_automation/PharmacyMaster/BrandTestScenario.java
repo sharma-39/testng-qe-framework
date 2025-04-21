@@ -1,6 +1,7 @@
 package org.test_automation.PharmacyMaster;
 
 import org.test_automation.DBConnectivity.MenuUtils;
+import org.test_automation.DBConnectivity.XPathUtil;
 import org.test_automation.Listener.AllTestListener;
 import org.test_automation.LoginUtil.LoginAndLocationTest;
 import org.openqa.selenium.By;
@@ -27,6 +28,7 @@ public class BrandTestScenario extends LoginAndLocationTest {
     static int incresescenario = 0;
     String editBrandCode;
     private final MenuUtils menuUtils=new MenuUtils();
+    private final XPathUtil xPathUtil=new XPathUtil();
 
     // Helper method to generate a random number with a prefix
     private String generateRandomNumber(String prefix) {
